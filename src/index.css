@@ -1,0 +1,521 @@
+/* stylelint-disable */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+  心域智护（XinyuCare）- 科技医疗设计系统
+  Design System: Medical Technology Modern Style
+  主色调: 医疗蓝 + 科技感渐变
+*/
+
+@layer base {
+  :root {
+    --radius: 0.75rem;
+    
+    /* ========== 浅色模式 - 科技医疗风格 ========== */
+    /* 背景色系 */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 20%;
+    
+    /* 卡片色系 */
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 20%;
+    
+    /* 弹出层色系 */
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 20%;
+    
+    /* 主色调: 医疗科技蓝 */
+    --primary: 214 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 214 100% 60%;
+    
+    /* 辅助色: 青蓝色 */
+    --secondary: 210 100% 96%;
+    --secondary-foreground: 214 100% 40%;
+    
+    /* 静音色: 中性灰 */
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 50%;
+    
+    /* 强调色: 医疗绿 */
+    --accent: 142 76% 96%;
+    --accent-foreground: 142 76% 36%;
+    
+    /* 危险色 */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* 边框和输入框 */
+    --border: 214 20% 90%;
+    --input: 214 20% 90%;
+    --ring: 214 100% 50%;
+    
+    /* 成功、警告、信息色 */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    
+    /* 图表配色: 医疗数据可视化 */
+    --chart-1: 214 100% 50%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 280 70% 55%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 340 85% 55%;
+    
+    /* 侧边栏配色 */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 25% 20%;
+    --sidebar-primary: 214 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 20% 96%;
+    --sidebar-accent-foreground: 215 25% 20%;
+    --sidebar-border: 214 20% 90%;
+    --sidebar-ring: 214 100% 50%;
+    
+    /* 渐变色 */
+    --gradient-primary: linear-gradient(135deg, hsl(214 100% 50%) 0%, hsl(199 89% 48%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(168 76% 42%) 100%);
+    --gradient-tech: linear-gradient(135deg, hsl(214 100% 50%) 0%, hsl(280 70% 55%) 100%);
+  }
+
+  .dark {
+    /* ========== 深色模式 - 科技医疗风格 ========== */
+    --background: 215 28% 12%;
+    --foreground: 210 40% 98%;
+    
+    --card: 215 28% 16%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 215 28% 16%;
+    --popover-foreground: 210 40% 98%;
+    
+    --primary: 214 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 214 100% 65%;
+    
+    --secondary: 215 28% 22%;
+    --secondary-foreground: 214 100% 60%;
+    
+    --muted: 215 28% 22%;
+    --muted-foreground: 215 20% 65%;
+    
+    --accent: 142 76% 22%;
+    --accent-foreground: 142 76% 50%;
+    
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 215 28% 22%;
+    --input: 215 28% 22%;
+    --ring: 214 100% 55%;
+    
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 53%;
+    --info-foreground: 0 0% 100%;
+    
+    --chart-1: 214 100% 60%;
+    --chart-2: 142 76% 45%;
+    --chart-3: 280 70% 60%;
+    --chart-4: 38 92% 55%;
+    --chart-5: 340 85% 60%;
+    
+    --sidebar-background: 215 28% 12%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 214 100% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 28% 22%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 28% 22%;
+    --sidebar-ring: 214 100% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* 字体层级系统 */
+  h1 {
+    @apply text-4xl font-bold tracking-tight;
+  }
+  
+  h2 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+  
+  h3 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  
+  h4 {
+    @apply text-xl font-semibold;
+  }
+  
+  h5 {
+    @apply text-lg font-medium;
+  }
+  
+  h6 {
+    @apply text-base font-medium;
+  }
+}
+
+@layer utilities {
+  /* ========== 科技医疗动画效果 ========== */
+  
+  /* 自定义滚动条样式 */
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(196 181 253);
+    border-radius: 4px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(167 139 250);
+  }
+  
+  .scrollbar-thumb-violet-300::-webkit-scrollbar-thumb {
+    background: rgb(196 181 253);
+  }
+  
+  .scrollbar-thumb-violet-400::-webkit-scrollbar-thumb {
+    background: rgb(167 139 250);
+  }
+  
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  /* 渐变文字效果 */
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--info)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  
+  /* 发光效果 */
+  .glow-primary {
+    box-shadow: 0 0 20px hsla(var(--primary) / 0.3),
+                0 0 40px hsla(var(--primary) / 0.2);
+  }
+  
+  .glow-success {
+    box-shadow: 0 0 20px hsla(var(--success) / 0.3),
+                0 0 40px hsla(var(--success) / 0.2);
+  }
+  
+  /* 玻璃态效果 */
+  .glass {
+    background: hsla(var(--card) / 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  .glass-dark {
+    background: hsla(var(--card) / 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  
+  /* 渐变背景 */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--info)) 100%);
+  }
+  
+  .bg-gradient-success {
+    background: linear-gradient(135deg, hsl(var(--success)) 0%, hsl(var(--accent-foreground)) 100%);
+  }
+  
+  .bg-gradient-tech {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--chart-3)) 100%);
+  }
+  
+  /* 脉冲动画 */
+  .pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  
+  /* 呼吸动画 */
+  .breathe {
+    animation: breathe 4s ease-in-out infinite;
+  }
+  
+  @keyframes breathe {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+  
+  /* 浮动动画 */
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  /* 闪烁动画 */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsla(var(--primary) / 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  
+  /* 扫描线效果 */
+  .scan-line {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scan-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+    animation: scan 2s linear infinite;
+  }
+  
+  @keyframes scan {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(500px);
+    }
+  }
+  
+  /* 平滑过渡 */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .transition-fast {
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .transition-slow {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* 卡片悬浮效果 */
+  .card-hover {
+    @apply transition-smooth hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  .card-hover-glow {
+    @apply transition-smooth hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  .card-hover-glow:hover {
+    box-shadow: 0 10px 30px hsla(var(--primary) / 0.2),
+                0 0 20px hsla(var(--primary) / 0.1);
+  }
+  
+  /* 按钮效果 */
+  .btn-glow {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-glow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: hsla(var(--primary-foreground) / 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .btn-glow:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  /* 骨架屏动画 */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+  
+  /* 数据加载动画 */
+  .loading-dots {
+    display: inline-flex;
+    gap: 4px;
+  }
+  
+  .loading-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: hsl(var(--primary));
+    animation: loading-dots 1.4s infinite ease-in-out both;
+  }
+  
+  .loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+  
+  .loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+  
+  @keyframes loading-dots {
+    0%, 80%, 100% {
+      transform: scale(0);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  /* 滚动条样式 */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* 3D Transform Utilities */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  /* 隐藏滚动条 */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ========== 响应式断点优化 ========== */
+@media (max-width: 768px) {
+  h1 {
+    @apply text-3xl;
+  }
+  
+  h2 {
+    @apply text-2xl;
+  }
+  
+  h3 {
+    @apply text-xl;
+  }
+}
+
+/* ========== 打印样式 ========== */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* ========== 可访问性优化 ========== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========== 高对比度模式 ========== */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 214 20% 70%;
+  }
+  
+  .dark {
+    --border: 214 20% 40%;
+  }
+}

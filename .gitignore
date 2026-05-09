@@ -1,0 +1,77 @@
+# =========================
+# Dependencies / Build
+# =========================
+node_modules/
+dist/
+dist-ssr/
+output/
+coverage/
+*.tsbuildinfo
+
+# Lockfiles not used by this project (pnpm workspace)
+package-lock.json
+yarn.lock
+
+# =========================
+# Logs / Runtime
+# =========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+*.local
+
+# =========================
+# Cache / Temp
+# =========================
+.cache/
+.vite_cache/
+.turbo/
+tmp/
+temp/
+*.tmp
+
+# Supabase local generated artifacts
+.supabase/
+supabase/.branches/
+supabase/.temp/
+
+# Vercel local metadata
+.vercel/
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Cursor / local sync artifacts
+.sync
+history/*.json
+
+# Old srcs directory (moved to public/srcs)
+/srcs

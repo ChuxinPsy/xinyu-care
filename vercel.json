@@ -1,0 +1,11 @@
+{
+  "framework": "vite",
+  "buildCommand": "pnpm run build",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/innerapi/v1/volc/responses", "destination": "/api/volc/responses" },
+    { "source": "/innerapi/v1/siliconflow/audio/transcriptions", "destination": "/api/siliconflow/audio/transcriptions" },
+    { "source": "/innerapi/v1/modelscope/chat/completions", "destination": "/api/modelscope/chat/completions" }
+  ]
+}

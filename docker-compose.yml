@@ -1,0 +1,35 @@
+# 僅包含前端開發／靜態站；不包含本地 Supabase。
+# 若 .env 使用 VITE_SUPABASE_URL=http://127.0.0.1:54321，請在主機執行 `supabase start`，
+# 或改為雲端專案 URL（https://xxx.supabase.co）。瀏覽器會直接向該 URL 發請求。
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    container_name: mindcareai-dev
+    env_file:
+      - path: .env
+        required: true
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/app
+      - mindcareai_node_modules:/app/node_modules
+    restart: unless-stopped
+
+  app-prod:
+    build:
+      context: .
+      target: prod
+    container_name: mindcareai-prod
+    env_file:
+      - path: .env
+        required: true
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    profiles:
+      - prod
+
+volumes:
+  mindcareai_node_modules:

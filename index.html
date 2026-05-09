@@ -1,0 +1,3573 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="心域智护 - 智能心理检测与疗愈助手，提供24/7心理健康评估与辅助治疗服务"
+    />
+    <title>心域智护-智能心理检测与疗愈助手</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23f093fb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23grad)'/%3E%3Cg fill='white'%3E%3Ccircle cx='50' cy='35' r='12' fill='white' opacity='0.9'/%3E%3Cpath d='M35 50 Q50 40 65 50 Q50 60 35 50' fill='white' opacity='0.8'/%3E%3Ccircle cx='42' cy='52' r='2' fill='white'/%3E%3Ccircle cx='58' cy='52' r='2' fill='white'/%3E%3Cpath d='M40 65 Q50 75 60 65' stroke='white' stroke-width='3' fill='none' opacity='0.9'/%3E%3Cpath d='M25 25 L30 30 M75 25 L70 30 M25 75 L30 70 M75 75 L70 70' stroke='white' stroke-width='2' opacity='0.6'/%3E%3C/g%3E%3C/svg%3E">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='grad2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23f093fb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='36' fill='url(%23grad2)'/%3E%3Cg fill='white'%3E%3Ccircle cx='90' cy='63' r='22' fill='white' opacity='0.9'/%3E%3Cpath d='M63 90 Q90 72 117 90 Q90 108 63 90' fill='white' opacity='0.8'/%3E%3Ccircle cx='76' cy='94' r='4' fill='white'/%3E%3Ccircle cx='104' cy='94' r='4' fill='white'/%3E%3Cpath d='M72 117 Q90 135 108 117' stroke='white' stroke-width='5' fill='none' opacity='0.9'/%3E%3Cpath d='M45 45 L54 54 M135 45 L126 54 M45 135 L54 126 M135 135 L126 126' stroke='white' stroke-width='4' opacity='0.6'/%3E%3C/g%3E%3C/svg%3E">
+    
+    <!-- 其他尺寸的图标 -->
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='grad3' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23f093fb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='url(%23grad3)'/%3E%3Cg fill='white'%3E%3Ccircle cx='16' cy='11' r='4' opacity='0.9'/%3E%3Cpath d='M11 16 Q16 13 21 16 Q16 19 11 16' opacity='0.8'/%3E%3Ccircle cx='13' cy='17' r='0.8'/%3E%3Ccircle cx='19' cy='17' r='0.8'/%3E%3Cpath d='M13 21 Q16 24 19 21' stroke='white' stroke-width='1' fill='none' opacity='0.9'/%3E%3C/g%3E%3C/svg%3E">
+    
+    <link rel="icon" type="image/png" sizes="16x16" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cdefs%3E%3ClinearGradient id='grad4' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23f093fb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='16' height='16' rx='3' fill='url(%23grad4)'/%3E%3Cg fill='white'%3E%3Ccircle cx='8' cy='5.5' r='2' opacity='0.9'/%3E%3Cpath d='M5.5 8 Q8 6.5 10.5 8 Q8 9.5 5.5 8' opacity='0.8'/%3E%3Cpath d='M6.5 10.5 Q8 12 9.5 10.5' stroke='white' stroke-width='0.5' fill='none' opacity='0.9'/%3E%3C/g%3E%3C/svg%3E">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json,%7B%22name%22%3A%22XinyuCare%22%2C%22short_name%22%3A%22XinyuCare%22%2C%22description%22%3A%22%E5%BF%83%E5%9F%9F%E6%99%BA%E6%8A%A4%20-%20%E5%A4%9A%E6%A8%A1%E6%80%81%E5%BF%83%E7%90%86%E6%A3%80%E6%B5%8B%E4%B8%8E%E7%96%97%E6%84%88%E7%B3%BB%E7%BB%9F%22%2C%22start_url%22%3A%22/%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23667eea%22%2C%22theme_color%22%3A%22%23764ba2%22%2C%22icons%22%3A%5B%5D%7D">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- AOS动画库 -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- GSAP动画库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+        overflow-x: hidden;
+      }
+
+      /* 鼠标跟随光效 */
+      .hero-gradient {
+        background: linear-gradient(
+          -45deg,
+          #667eea,
+          #764ba2,
+          #f093fb,
+          #f5576c,
+          #4facfe,
+          #00f2fe
+        );
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        position: relative;
+        overflow: hidden;
+        cursor: none;
+      }
+
+      .mouse-glow {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transition: all 0.1s ease;
+        z-index: 5;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* 动态粒子效果 */
+      .hero-gradient::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+          radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 60% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+        animation: particleFloat 20s ease-in-out infinite;
+      }
+
+      /* 左下角固定背景图片样式 - 仅在电脑端显示 */
+      .fixed-bottom-left-bg {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 0;
+        pointer-events: none;
+        display: none;
+      }
+
+      .fixed-bottom-left-bg img {
+        width: 250px;
+        height: auto;
+        max-width: 40vw;
+        opacity: 0.8;
+        display: block;
+      }
+
+      /* 电脑端显示（大于768px） */
+      @media (min-width: 769px) {
+        .fixed-bottom-left-bg {
+          display: block;
+        }
+      }
+
+      /* SmartBandPage 顶部背景 - 移动端默认（显示图片+渐变） */
+      .smartband-header-bg {
+        background-image: url(/sh.png), linear-gradient(to bottom right, #0d9488, #06b6d4, #3b82f6);
+        background-size: contain, 100% 100%;
+        background-position: center bottom, center;
+        background-repeat: no-repeat, no-repeat;
+      }
+
+      /* SmartBandPage 顶部背景 - 电脑端仅渐变色（不显示图片） */
+      @media (min-width: 769px) {
+        .smartband-header-bg {
+          background-image: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+          background-size: 100% 100%;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+      }
+
+      /* 流光效果 */
+      .hero-gradient::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.1) 50%,
+          transparent 70%
+        );
+        transform: translateX(-100%);
+        animation: shimmer 8s ease-in-out infinite;
+      }
+
+      @keyframes particleFloat {
+        0%, 100% {
+          transform: translateY(0px) rotate(0deg);
+          opacity: 1;
+        }
+        25% {
+          transform: translateY(-30px) rotate(90deg);
+          opacity: 0.8;
+        }
+        50% {
+          transform: translateY(-10px) rotate(180deg);
+          opacity: 0.6;
+        }
+        75% {
+          transform: translateY(-20px) rotate(270deg);
+          opacity: 0.9;
+        }
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%) skewX(-15deg);
+        }
+        50% {
+          transform: translateX(100%) skewX(-15deg);
+        }
+        100% {
+          transform: translateX(-100%) skewX(-15deg);
+        }
+      }
+
+      /* 增强玻璃态效果 */
+      .glass-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .glass-card:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .glass-nav {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      }
+
+      /* 全国首发徽章样式 */
+      .launch-badge {
+        position: absolute;
+        top: -5px;
+        right: -85px; /* 向右平移约两个空格距离 */
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        animation: badgePulse 2s ease-in-out infinite, badgeFloat 4s ease-in-out infinite;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 10;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        white-space: nowrap;
+      }
+
+      .launch-badge::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #4f46e5, #7c3aed, #ec4899, #06b6d4);
+        border-radius: 17px;
+        z-index: -1;
+        animation: badgeGlow 3s linear infinite;
+      }
+
+      .launch-badge::after {
+        content: "✨";
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        font-size: 0.8rem;
+        animation: sparkle 1.5s ease-in-out infinite;
+        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
+      }
+
+      @keyframes badgePulse {
+        0%, 100% {
+          transform: scale(1);
+          box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 0 12px 35px rgba(79, 70, 229, 0.6);
+        }
+      }
+
+      @keyframes badgeFloat {
+        0%, 100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        25% {
+          transform: translateY(-5px) rotate(1deg);
+        }
+        50% {
+          transform: translateY(-3px) rotate(0deg);
+        }
+        75% {
+          transform: translateY(-7px) rotate(-1deg);
+        }
+      }
+
+      @keyframes badgeGlow {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      @keyframes sparkle {
+        0%, 100% {
+          opacity: 1;
+          transform: scale(1) rotate(0deg);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.2) rotate(180deg);
+        }
+      }
+
+      .launch-badge:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 15px 40px rgba(79, 70, 229, 0.7);
+        background: linear-gradient(135deg, #3730a3 0%, #6d28d9 50%, #db2777 100%);
+      }
+
+      .launch-badge:hover::after {
+        animation: sparkleHover 0.5s ease-in-out infinite;
+      }
+
+      @keyframes sparkleHover {
+        0%, 100% {
+          transform: scale(1.2) rotate(0deg);
+        }
+        50% {
+          transform: scale(1.5) rotate(360deg);
+        }
+      }
+
+      @keyframes badgeShake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-3px) rotate(-2deg); }
+        20%, 40%, 60%, 80% { transform: translateX(3px) rotate(2deg); }
+      }
+
+      /* 徽章容器 - 只包裹字母I */
+      .title-with-badge {
+        position: relative;
+        display: inline-block;
+        margin-right:50px; /* 增加右边距以适应徽章位置 */
+      }
+
+      /* 响应式调整 */
+      @media (max-width: 768px) {
+        .title-with-badge {
+          margin-right: 40px;
+        }
+        
+        .launch-badge {
+          top: -5px;
+          right: auto;
+          left: 100%;
+          margin-left: 4px;
+          padding: 3px 6px;
+          font-size: 0.55rem;
+          border-radius: 10px;
+          letter-spacing: 0.3px;
+          white-space: nowrap;
+        }
+        
+        .launch-badge::before {
+          border-radius: 14px;
+        }
+        
+        .launch-badge::after {
+          top: -4px;
+          right: -4px;
+          font-size: 0.7rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .title-with-badge {
+          margin-right: 0;
+          position: relative;
+          display: inline-block;
+        }
+        
+        .launch-badge {
+          top: -8px;
+          right: auto;
+          left: 100%;
+          margin-left: 4px;
+          padding: 2px 5px;
+          font-size: 0.5rem;
+          white-space: nowrap;
+        }
+        
+        .launch-badge::after {
+          top: -2px;
+          right: -2px;
+          font-size: 0.5rem;
+        }
+      }
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: rippleEffect 0.6s linear;
+        pointer-events: none;
+      }
+
+      @keyframes rippleEffect {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
+      /* 增强悬浮动画 */
+      .float-animation {
+        animation: enhancedFloat 8s ease-in-out infinite;
+      }
+
+      @keyframes enhancedFloat {
+        0%, 100% {
+          transform: translateY(0px) rotate(0deg) scale(1);
+        }
+        25% {
+          transform: translateY(-30px) rotate(5deg) scale(1.1);
+        }
+        50% {
+          transform: translateY(-15px) rotate(-3deg) scale(0.95);
+        }
+        75% {
+          transform: translateY(-25px) rotate(2deg) scale(1.05);
+        }
+      }
+
+      /* 脉冲动画 */
+      .pulse-glow {
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 40px rgba(102, 126, 234, 0.8);
+        }
+      }
+
+      /* 副标题左上角表情图定位 */
+      .title-wrap {
+        position: relative;
+        display: inline-block;
+        max-width: 100%;
+      }
+
+      .title-with-badge {
+        position: relative;
+        display: inline-block;
+      }
+
+      .subheading-wrap {
+        display: block;
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+
+      .hero-image-carousel {
+        display: none !important;
+      }
+
+      .hero-carousel-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 3px solid rgba(255, 255, 255, 0.4);
+        animation: heroFloat 6s ease-in-out infinite;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .hero-carousel-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: scale(1.05);
+        animation: heroImageZoom 7s ease-in-out infinite;
+      }
+
+      .hero-carousel-image.active {
+        opacity: 1;
+      }
+
+      @keyframes heroFloat {
+        0%, 100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        25% {
+          transform: translateY(-10px) rotate(3deg);
+        }
+        50% {
+          transform: translateY(-5px) rotate(0deg);
+        }
+        75% {
+          transform: translateY(-12px) rotate(-3deg);
+        }
+      }
+
+      @keyframes heroImageZoom {
+        0%, 100% {
+          transform: scale(1.05);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      /* 顶部图片加载指示器 */
+      .hero-image-loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: 20;
+      }
+
+      /* 响应式调整 - 避免重叠 */
+      @media (max-width: 1200px) {
+        .hero-image-carousel {
+          width: 120px;
+          height: 120px;
+          transform: translate(calc(-100% - 1ch), calc(-28% - 1ch));
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero-image-carousel {
+          width: 95px;
+          height: 95px;
+          left: 50%;
+          transform: translate(-50%, -100%);
+        }
+        
+        .hero-image-loader {
+          width: 30px;
+          height: 30px;
+          border-width: 2px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .hero-image-carousel {
+          width: 80px;
+          height: 80px;
+          left: 50%;
+          transform: translate(-50%, -100%);
+        }
+        
+        .hero-image-loader {
+          width: 25px;
+          height: 25px;
+        }
+      }
+
+      /* 炫彩渐变文字 - 与桌面端导航栏完全一致 */
+      .gradient-text {
+        background: linear-gradient(to right, #9333ea 0%, #db2777 50%, #e11d48 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+        color: transparent !important;
+        display: inline-block;
+        line-height: 1.2;
+        font-size: 1.125rem;
+        font-weight: 700;
+      }
+
+      /* 用户功能 - 青蓝渐变 */
+      .gradient-text-user {
+        background: linear-gradient(to right, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+        color: transparent !important;
+        display: inline-block;
+        line-height: 1.2;
+        font-size: 1.875rem;
+        font-weight: 700;
+      }
+
+      /* 医生功能 - 青绿渐变 */
+      .gradient-text-doctor {
+        background: linear-gradient(to right, #06b6d4 0%, #10b981 50%, #84cc16 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+        color: transparent !important;
+        display: inline-block;
+        line-height: 1.2;
+        font-size: 1.875rem;
+        font-weight: 700;
+      }
+
+      /* Logo容器样式 - 防止闪屏 */
+      .logo-container {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: transparent;
+      }
+
+      .logo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+
+      /* Logo与文字容器 - 确保间距稳定 */
+      .logo-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      @keyframes textShimmer {
+        0%, 100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      /* GitHub按钮样式 */
+      .github-btn {
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .github-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .github-btn:active {
+        transform: scale(0.95);
+        transition: all 0.1s ease;
+      }
+
+      /* 移动端GitHub按钮 */
+      @media (max-width: 768px) {
+        .github-btn-mobile {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 1000;
+          padding: 8px;
+          transition: all 0.3s ease;
+        }
+
+        .github-btn-mobile:hover {
+          transform: scale(1.1);
+        }
+
+        .github-btn-mobile:active {
+          transform: scale(0.95);
+        }
+      }
+
+      /* 在线使用按钮 - 红色到深红色渐变 */
+      .btn-primary {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        border: none;
+      }
+
+      .btn-primary::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transition: left 0.6s ease;
+      }
+
+      /* 产品文档按钮 - 绿色到青绿色渐变 */
+      .btn-docs {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        border: none;
+      }
+
+      /* 下载安装按钮 - 蓝色到紫色渐变 */
+      .btn-download {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        border: none;
+      }
+
+      .btn-download::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transition: left 0.6s ease;
+      }
+
+      .btn-download::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%);
+        transition: width 0.3s ease, height 0.3s ease;
+        pointer-events: none;
+      }
+
+      .btn-download:hover {
+        transform: translateY(-6px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4), 0 0 30px rgba(96, 165, 250, 0.3);
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        animation: bluePulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes bluePulse {
+        0%, 100% {
+          box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4), 0 0 30px rgba(96, 165, 250, 0.3);
+        }
+        50% {
+          box-shadow: 0 25px 50px rgba(59, 130, 246, 0.6), 0 0 40px rgba(96, 165, 250, 0.5);
+        }
+      }
+
+      .btn-download:hover::before {
+        left: 100%;
+      }
+
+      .btn-download:active {
+        transform: translateY(-2px) scale(1.02);
+        transition: all 0.15s ease;
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.6);
+      }
+
+      /* 下载弹窗样式 */
+      .download-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        z-index: 9999;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .download-modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        box-sizing: border-box;
+      }
+
+      .download-modal-content {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        box-sizing: border-box;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px) scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .download-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .download-close:hover {
+        background: #e5e7eb;
+        transform: rotate(90deg);
+      }
+
+      .download-option {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        margin: 12px 0;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #1f2937;
+      }
+
+      .download-option:hover {
+        transform: translateX(8px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      }
+
+      .download-option.windows {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      }
+
+      .download-option.android {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      }
+
+      .download-option.ios {
+        background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      }
+
+      .download-icon {
+        width: 48px;
+        height: 48px;
+        margin-right: 16px;
+        flex-shrink: 0;
+      }
+
+      .download-info h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .download-info p {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      /* 移动端适配 - 防止横向滚动 */
+      @media (max-width: 640px) {
+        html, body {
+          max-width: 100vw;
+          width: 100%;
+          overflow-x: hidden !important;
+          position: relative;
+        }
+
+        *, *::before, *::after {
+          box-sizing: border-box;
+        }
+
+        img, video, iframe {
+          max-width: 100%;
+          height: auto;
+        }
+
+        /* 确保容器不会溢出 */
+        .container {
+          width: 100%;
+          max-width: 100vw;
+          padding-left: 16px;
+          padding-right: 16px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        /* 修复可能的溢出元素 */
+        .hero-gradient, section, nav, footer {
+          width: 100%;
+          max-width: 100vw;
+          overflow-x: hidden;
+        }
+
+        .download-modal.active {
+          padding: 16px;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .download-modal-content {
+          padding: 20px;
+          width: 100%;
+          max-width: 340px;
+          margin: auto;
+          border-radius: 16px;
+          max-height: 85vh;
+        }
+
+        .download-modal-content h2 {
+          font-size: 20px;
+          margin-bottom: 4px;
+          padding-right: 32px;
+        }
+
+        .download-modal-content > p {
+          font-size: 13px;
+          margin-bottom: 16px;
+        }
+
+        .download-option {
+          padding: 12px;
+          margin: 8px 0;
+          border-radius: 12px;
+        }
+
+        .download-icon {
+          width: 36px;
+          height: 36px;
+          margin-right: 10px;
+        }
+
+        .download-info h3 {
+          font-size: 15px;
+          margin-bottom: 2px;
+        }
+
+        .download-info p {
+          font-size: 12px;
+        }
+
+        .download-close {
+          width: 28px;
+          height: 28px;
+          top: 16px;
+          right: 16px;
+        }
+
+        .download-close svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      .btn-docs::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transition: left 0.6s ease;
+      }
+
+      .btn-primary::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%);
+        transition: width 0.3s ease, height 0.3s ease;
+        pointer-events: none;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-6px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(239, 68, 68, 0.4), 0 0 30px rgba(248, 113, 113, 0.3);
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        animation: redPulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes redPulse {
+        0%, 100% {
+          box-shadow: 0 20px 40px rgba(239, 68, 68, 0.4), 0 0 30px rgba(248, 113, 113, 0.3);
+        }
+        50% {
+          box-shadow: 0 25px 50px rgba(239, 68, 68, 0.6), 0 0 40px rgba(248, 113, 113, 0.5);
+        }
+      }
+
+      .btn-primary:hover::before {
+        left: 100%;
+      }
+
+      .btn-docs::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%);
+        transition: width 0.3s ease, height 0.3s ease;
+        pointer-events: none;
+      }
+
+      .btn-docs:hover {
+        transform: translateY(-6px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4), 0 0 30px rgba(52, 211, 153, 0.3);
+        background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+        animation: greenPulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes greenPulse {
+        0%, 100% {
+          box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4), 0 0 30px rgba(52, 211, 153, 0.3);
+        }
+        50% {
+          box-shadow: 0 25px 50px rgba(16, 185, 129, 0.6), 0 0 40px rgba(52, 211, 153, 0.5);
+        }
+      }
+
+      .btn-docs:hover::before {
+        left: 100%;
+      }
+
+      .btn-primary:active {
+        transform: translateY(-2px) scale(1.02);
+        transition: all 0.15s ease;
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.6);
+      }
+
+      /* 点击波纹效果增强 */
+      .btn-primary:active::after {
+        width: 200px;
+        height: 200px;
+        transition: width 0.4s ease, height 0.4s ease;
+      }
+
+      /* 按钮点击动画 */
+      @keyframes buttonClick {
+        0% { transform: translateY(-6px) scale(1.05); }
+        50% { transform: translateY(-8px) scale(1.08); }
+        100% { transform: translateY(-6px) scale(1.05); }
+      }
+
+      /* 移除脉冲效果 */
+      .pulse-glow {
+        /* 移除动画，保持静态样式 */
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+      }
+
+      /* 卡片悬停效果 */
+      .feature-card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      /* 图标动画 */
+      .icon-container {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .icon-container::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.1);
+        transform: translate(-50%, -50%);
+        transition:
+          width 0.6s,
+          height 0.6s;
+      }
+
+      .feature-card:hover .icon-container::after {
+        width: 200px;
+        height: 200px;
+      }
+
+      /* 滚动进度条 */
+      .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #f093fb 100%
+        );
+        z-index: 9999;
+        transition: width 0.1s;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 768px) {
+        .hero-title {
+          font-size: 2rem;
+        }
+        .hero-subtitle {
+          font-size: 1rem;
+        }
+      }
+
+      /* 平滑滚动 */
+      html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        width: 100%;
+      }
+
+      /* 防止移动端横向滚动 */
+      html, body {
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+
+      body {
+        position: relative;
+        width: 100%;
+      }
+
+      /* 自定义滚动条 */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 5px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      }
+
+      /* 炫彩数字计数 */
+      .counter {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+        animation: counterGlow 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes counterGlow {
+        0% {
+          filter: brightness(1);
+        }
+        100% {
+          filter: brightness(1.2);
+        }
+      }
+
+      /* 评价卡片 */
+      .testimonial-card {
+        transition: all 0.3s ease;
+      }
+
+      .testimonial-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      }
+      #features {
+        display: none !important;
+      }
+      body {
+        -webkit-tap-highlight-color: transparent;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+      @media (max-width: 640px) {
+        .hero-title {
+          font-size: clamp(1.6rem, 5.5vw, 2rem);
+          line-height: 1.3;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          margin-top: 2rem;
+        }
+        .hero-subtitle {
+          font-size: clamp(1rem, 3.5vw, 1.15rem);
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+        .subheading-wrap span {
+          font-size: clamp(1.1rem, 4vw, 1.3rem) !important;
+        }
+        .btn-primary {
+          min-height: 56px;
+          padding: 16px 24px;
+          border-radius: 9999px;
+          font-size: 1.1rem;
+        }
+        #mobileMenuBtn {
+          padding: 12px;
+          border-radius: 12px;
+        }
+        nav .container {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+        .glass-card {
+          padding: 16px;
+        }
+        .testimonial-card {
+          padding: 16px;
+        }
+        .counter {
+          font-size: 1.75rem;
+          line-height: 1.2;
+        }
+        .scroll-progress {
+          height: 2px;
+        }
+        .float-animation {
+          display: none;
+        }
+        #cta a {
+          min-height: 48px;
+          padding: 12px 20px;
+        }
+        #cta .text-4xl {
+          font-size: 1.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div id="landing">
+      <!-- 滚动进度条 -->
+      <div class="scroll-progress" id="scrollProgress"></div>
+
+      <!-- 导航栏 -->
+      <nav
+        class="glass-nav fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+        id="navbar"
+      >
+        <div class="container mx-auto px-4 py-2">
+          <div class="flex items-center justify-between">
+            <div class="logo-brand">
+              <div class="logo-container">
+                <img src="https://www.gitcc.com/uploads/-/system/appearance/header_logo/1/gitpp.png" alt="心域智护" />
+              </div>
+              <span class="gradient-text">心域智护</span>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-6">
+              <a
+                href="#features"
+                class="text-gray-700 hover:text-purple-600 transition-colors duration-300 font-medium"
+                >产品特色</a
+              >
+              <a
+                href="#functions"
+                class="text-gray-700 hover:text-purple-600 transition-colors duration-300 font-medium"
+                >核心功能</a
+              >
+              <a
+                href="#testimonials"
+                class="text-gray-700 hover:text-purple-600 transition-colors duration-300 font-medium"
+                >用户评价</a
+              >
+              <a
+                href="#cta"
+                class="text-gray-700 hover:text-purple-600 transition-colors duration-300 font-medium"
+                >关于我们</a
+              >
+            </div>
+
+            <!-- 桌面端按钮组 -->
+            <div class="hidden md:flex items-center space-x-4">
+              <a
+                href="/#/login"
+                class="text-gray-700 hover:text-purple-600 transition-colors duration-300 font-medium"
+                >登录</a
+              >
+              <a
+                href="/#/"
+                class="btn-primary text-white px-6 py-2 rounded-full font-semibold shadow-lg"
+                >立即体验</a
+              >
+              <!-- GitHub按钮 -->
+              <a
+                href="https://www.gitcc.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="github-btn p-2 hover:bg-gray-100 rounded-lg transition-all duration-300"
+                title="访问官网"
+              >
+                <svg class="w-6 h-6 text-gray-800 hover:text-black transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                </svg>
+              </a>
+            </div>
+
+            <!-- 移动端按钮组 -->
+            <div class="flex md:hidden items-center space-x-0">
+              <!-- GitHub按钮 -->
+              <a
+                href="https://www.gitcc.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="github-btn p-2 hover:bg-gray-100 rounded-lg transition-all duration-300"
+                title="访问官网"
+              >
+                <svg class="w-6 h-6 text-gray-800 hover:text-black transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                </svg>
+              </a>
+              <!-- 移动端菜单按钮 -->
+              <button class="text-gray-700" id="mobileMenuBtn">
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 移动端菜单 -->
+          <div class="hidden md:hidden mt-4 pb-4 w-full border-t border-gray-200/50 pt-4" id="mobileMenu">
+            <a
+              href="#features"
+              class="block py-2 text-gray-700 hover:text-purple-600 transition-colors"
+              >产品特色</a
+            >
+            <a
+              href="#functions"
+              class="block py-2 text-gray-700 hover:text-purple-600 transition-colors"
+              >核心功能</a
+            >
+            <a
+              href="#testimonials"
+              class="block py-2 text-gray-700 hover:text-purple-600 transition-colors"
+              >用户评价</a
+            >
+            <a
+              href="#cta"
+              class="block py-2 text-gray-700 hover:text-purple-600 transition-colors"
+              >关于我们</a
+            >
+            <a
+              href="/#/login"
+              class="block py-2 text-gray-700 hover:text-purple-600 transition-colors"
+              >登录</a
+            >
+            <a
+              href="https://www.gitcc.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center py-2 text-gray-700 hover:text-purple-600 transition-colors"
+            >
+              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+              </svg>
+              官网主页
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- 英雄区域 -->
+      <section
+        class="hero-gradient min-h-screen flex items-center justify-center pt-20 relative"
+        id="heroSection"
+      >
+        <!-- 鼠标跟随光效 -->
+        <div class="mouse-glow" id="mouseGlow"></div>
+        <div
+          class="container mx-auto px-6 text-center text-white relative z-10"
+        >
+          <div data-aos="fade-up" data-aos-duration="1000">
+            <h1
+              class="hero-title text-5xl md:text-7xl font-bold mb-6 leading-tight text-white drop-shadow-lg"
+            >
+              <div class="title-wrap relative inline-block">
+                XinyuC<span class="title-with-badge">are<div class="launch-badge" id="launchBadge">全国首发</div></span>
+                <div class="hero-image-carousel">
+                  <div class="hero-carousel-wrapper">
+                    <div class="hero-image-loader" id="heroImageLoader"></div>
+                    <div id="heroImageCarousel"></div>
+                  </div>
+                </div>
+              </div>
+            </h1>
+            <div class="subheading-wrap relative inline-block">
+              <span class="text-2xl sm:text-3xl md:text-5xl font-light text-white opacity-90">多模态心理检测与疗愈系统</span>
+            </div>
+          </div>
+
+          <div data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
+            <br>
+            <p
+              class="hero-subtitle text-xl md:text-2xl mb-8 max-w-3xl mx-auto font-light leading-relaxed text-white opacity-90 drop-shadow-md"
+            >
+              新一代主动式AI对话量表评估、多模态情绪识别、个性化疗愈解决方案
+            </p>
+          </div>
+
+          <div
+            data-aos="fade-up"
+            data-aos-delay="400"
+            data-aos-duration="1000"
+            class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-16 px-4"
+          >
+            <a
+              href="/#/"
+              class="btn-primary text-white px-6 sm:px-12 py-4 sm:py-6 rounded-full text-base sm:text-xl font-bold shadow-2xl inline-flex items-center space-x-2 hover:scale-105 transition-all duration-300 hover:shadow-3xl w-full sm:w-auto justify-center max-w-[280px] sm:max-w-none"
+            >
+              <span>在线使用</span>
+              <svg
+                class="w-4 h-4 sm:w-6 sm:h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                ></path>
+              </svg>
+            </a>
+            <button
+              id="downloadBtn"
+              class="btn-download text-white px-6 sm:px-12 py-4 sm:py-6 rounded-full text-base sm:text-xl font-bold shadow-2xl inline-flex items-center space-x-2 hover:scale-105 transition-all duration-300 hover:shadow-3xl w-full sm:w-auto justify-center max-w-[280px] sm:max-w-none"
+            >
+              <span>下载安装</span>
+              <svg
+                class="w-4 h-4 sm:w-6 sm:h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                ></path>
+              </svg>
+            </button>
+            <a
+              href="https://my.feishu.cn/wiki/DH7gw3RumiZLNikKj6zcKFNpnuh"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-docs text-white px-6 sm:px-12 py-4 sm:py-6 rounded-full text-base sm:text-xl font-bold shadow-2xl inline-flex items-center space-x-2 hover:scale-105 transition-all duration-300 hover:shadow-3xl w-full sm:w-auto justify-center max-w-[280px] sm:max-w-none"
+            >
+              <span>产品文档</span>
+              <svg
+                class="w-4 h-4 sm:w-6 sm:h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+            </a>
+          </div>
+
+          <!-- 统计数据 -->
+          <div
+            data-aos="fade-up"
+            data-aos-delay="600"
+            data-aos-duration="1000"
+            class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto pb-8 md:pb-12"
+          >
+            <div class="glass-card rounded-2xl p-6">
+              <div class="counter" data-target="9500万">0</div>
+              <p class="text-white font-medium mt-2 opacity-80">抑郁患者</p>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+              <div class="counter" data-target="6.4万">0</div>
+              <p class="text-white font-medium mt-2 opacity-80">心理医生</p>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+              <div class="counter" data-target="17.5%">0</div>
+              <p class="text-white font-medium mt-2 opacity-80">抑郁患率</p>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+              <div class="counter" data-target="24 h">0</div>
+              <p class="text-white font-medium mt-2 opacity-80">AI赋能筛查</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 炫彩浮动装饰元素 -->
+        <div
+          class="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 opacity-30 rounded-full float-animation blur-sm"
+          style="animation-delay: 0s"
+        ></div>
+        <div
+          class="absolute top-40 right-20 w-32 h-32 bg-gradient-to-br from-blue-400 to-cyan-500 opacity-25 rounded-full float-animation blur-sm"
+          style="animation-delay: 1s"
+        ></div>
+        <div
+          class="absolute bottom-20 left-1/4 w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 opacity-35 rounded-full float-animation blur-sm"
+          style="animation-delay: 2s"
+        ></div>
+        <div
+          class="absolute top-1/3 right-1/4 w-24 h-24 bg-gradient-to-br from-green-400 to-teal-500 opacity-20 rounded-full float-animation blur-sm"
+          style="animation-delay: 3s"
+        ></div>
+        <div
+          class="absolute bottom-1/3 left-1/3 w-28 h-28 bg-gradient-to-br from-indigo-400 to-purple-600 opacity-25 rounded-full float-animation blur-sm"
+          style="animation-delay: 4s"
+        ></div>
+        <div
+          class="absolute top-2/3 right-1/3 w-18 h-18 bg-gradient-to-br from-red-400 to-pink-500 opacity-30 rounded-full float-animation blur-sm"
+          style="animation-delay: 5s"
+        ></div>
+        
+      </section>
+
+      <!-- 特色亮点 -->
+      <section
+        class="py-20 bg-gradient-to-br from-purple-50 to-pink-50"
+        id="features"
+      >
+        <div class="container mx-auto px-6">
+          <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-4">
+              核心特色
+            </h2>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+              创新技术与人文关怀的完美结合
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- AI智能评估 -->
+            <div
+              class="feature-card glass-card rounded-3xl p-8"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            >
+              <div
+                class="icon-container w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6"
+              >
+                <svg
+                  class="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-4">AI智能评估</h3>
+              <p class="text-gray-600 leading-relaxed mb-4">
+                结合语音、文本、面部表情等多模态数据，提供全面深入的心理状态分析
+              </p>
+              <div class="flex items-center text-purple-600 font-semibold">
+                <span>了解更多</span>
+                <svg
+                  class="w-4 h-4 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 24/7危机干预 -->
+            <div
+              class="feature-card glass-card rounded-3xl p-8"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
+              <div
+                class="icon-container w-16 h-16 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl flex items-center justify-center mb-6"
+              >
+                <svg
+                  class="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-4">24/7危机干预</h3>
+              <p class="text-gray-600 leading-relaxed mb-4">
+                实时监测情绪变化，自动识别自杀风险，第一时间触发专业医生介入
+              </p>
+              <div class="flex items-center text-purple-600 font-semibold">
+                <span>了解更多</span>
+                <svg
+                  class="w-4 h-4 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 个性化疗愈 -->
+            <div
+              class="feature-card glass-card rounded-3xl p-8"
+              data-aos="fade-up"
+              data-aos-delay="300"
+            >
+              <div
+                class="icon-container w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl flex items-center justify-center mb-6"
+              >
+                <svg
+                  class="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-4">个性化疗愈</h3>
+              <p class="text-gray-600 leading-relaxed mb-4">
+                根据您的独特需求，定制专属冥想、放松训练和认知行为疗法方案
+              </p>
+              <div class="flex items-center text-purple-600 font-semibold">
+                <span>了解更多</span>
+                <svg
+                  class="w-4 h-4 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 医患协作 -->
+            <div
+              class="feature-card glass-card rounded-3xl p-8"
+              data-aos="fade-up"
+              data-aos-delay="400"
+            >
+              <div
+                class="icon-container w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-6"
+              >
+                <svg
+                  class="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-4">医患协作平台</h3>
+              <p class="text-gray-600 leading-relaxed mb-4">
+                无缝连接AI评估与专业医生，提供从筛查到诊疗的全流程服务
+              </p>
+              <div class="flex items-center text-purple-600 font-semibold">
+                <span>了解更多</span>
+                <svg
+                  class="w-4 h-4 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 核心功能模块 -->
+      <section class="py-20 bg-white" id="functions">
+        <div class="container mx-auto px-6">
+          <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-4">
+              核心功能
+            </h2>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+              全方位的心理智能检测与疗愈解决方案
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <!-- 用户侧功能 -->
+            <div data-aos="fade-right" data-aos-delay="100">
+              <div class="glass-card rounded-3xl p-8">
+                <h3 class="text-3xl font-bold mb-6 gradient-text-user">用户功能</h3>
+                <div class="space-y-6">
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-purple-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">情绪日记</h4>
+                      <p class="text-gray-600">
+                         记录每日情绪变化,智能分析情绪趋势,发现潜在问题
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-blue-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">AI主动式量表对话</h4>
+                      <p class="text-gray-600">
+                      大模型主动共情对话,PHQ-9、HAMD-17等专业量表评估
+                      </p>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">多模态AI情绪评估</h4>
+                      <p class="text-gray-600">
+                        支持文本/语音/表情/手表生理数据情绪分析，生成报告
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-yellow-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">个性化疗愈</h4>
+                      <p class="text-gray-600">
+                       提供冥想/树洞/知识库，帮助您缓解焦虑、放松睡眠
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-pink-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">可视化评估报告</h4>
+                      <p class="text-gray-600">
+                        生成多维的心理健康评估报告,可分享给专业医生
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 医生侧功能 -->
+            <div data-aos="fade-left" data-aos-delay="200">
+              <div class="glass-card rounded-3xl p-8">
+                <h3 class="text-3xl font-bold mb-6 gradient-text-doctor">医生功能</h3>
+                <div class="space-y-6">
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-indigo-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">患者管理</h4>
+                      <p class="text-gray-600">
+                        集中管理所有患者信息,实时查看AI评估结果与跟踪记录
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-red-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">预警中心</h4>
+                      <p class="text-gray-600">
+                        实时接收高风险患者预警,快速响应紧急情况
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-teal-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">知识库管理</h4>
+                      <p class="text-gray-600">
+                        自定义删添改查量表知识库内容，科学筛查
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-orange-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">数据分析</h4>
+                      <p class="text-gray-600">
+                        可视化患者数据仪表盘,辅助诊断决策与疗效评估
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-4">
+                    <div
+                      class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-6 h-6 text-purple-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                        ></path>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="text-xl font-semibold mb-2">系统设置</h4>
+                      <p class="text-gray-600">
+                        灵活配置预警阈值、通知方式等参数
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 用户评价 -->
+      <section
+        class="py-20 bg-gradient-to-br from-purple-50 to-pink-50"
+        id="testimonials"
+      >
+        <div class="container mx-auto px-6">
+          <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-4">
+              用户评价
+            </h2>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+              听听他们的改变故事
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div
+              class="testimonial-card glass-card rounded-3xl p-8"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            >
+              <div class="flex items-center mb-6">
+                <div
+                  class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                >
+                  李
+                </div>
+                <div class="ml-4">
+                  <h4 class="font-semibold text-lg">李女士</h4>
+                  <div class="flex text-yellow-400">
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <p class="text-gray-700 leading-relaxed mb-4">
+                “使用XinyuCare
+                AI使用7天后，我的睡眠质量明显改善。AI的评估非常专业，而且冥想训练特别有效，让我学会了如何管理焦虑情绪。”
+              </p>
+              <p class="text-gray-500 text-sm">—— 使用了7天</p>
+            </div>
+
+            <div
+              class="testimonial-card glass-card rounded-3xl p-8"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
+              <div class="flex items-center mb-6">
+                <div
+                  class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                >
+                  王
+                </div>
+                <div class="ml-4">
+                  <h4 class="font-semibold text-lg">王先生</h4>
+                  <div class="flex text-yellow-400">
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <p class="text-gray-700 leading-relaxed mb-4">
+                “作为一名互联网从业者，工作压力很大。XinyuCare
+                AI的情绪日记功能让我更好地了解自己的状态，24/7的AI陪伴让我感觉不再孤单。”
+              </p>
+              <p class="text-gray-500 text-sm">—— 使用了36天</p>
+            </div>
+
+            <div
+              class="testimonial-card glass-card rounded-3xl p-8"
+              data-aos="fade-up"
+              data-aos-delay="300"
+            >
+              <div class="flex items-center mb-6">
+                <div
+                  class="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                >
+                  张
+                </div>
+                <div class="ml-4">
+                  <h4 class="font-semibold text-lg">张医生</h4>
+                  <div class="flex text-yellow-400">
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <p class="text-gray-700 leading-relaxed mb-4">
+                “作为一名心理医生，这个系统极大提高了我的工作效率。AI评估非常准确，危机预警功能让我能及时干预高风险患者，救了很多人。”
+              </p>
+              <p class="text-gray-500 text-sm">—— 使用了96天</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA区域 -->
+      <section
+        class="py-32 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 relative overflow-hidden"
+        id="cta"
+      >
+        <div class="absolute inset-0 opacity-10">
+          <div
+            class="absolute w-96 h-96 bg-white rounded-full blur-3xl top-10 left-10 animate-pulse"
+          ></div>
+          <div
+            class="absolute w-96 h-96 bg-white rounded-full blur-3xl bottom-10 right-10 animate-pulse"
+            style="animation-delay: 1s"
+          ></div>
+        </div>
+
+        <div class="container mx-auto px-6 text-center relative z-10">
+          <div data-aos="fade-up">
+            <h2 class="text-4xl md:text-6xl font-bold text-white mb-6">
+              开启您的心理健康之旅
+            </h2>
+            <p
+              class="text-xl md:text-2xl text-white opacity-90 mb-12 max-w-3xl mx-auto"
+            >
+              立即体验心域智护，让专业的AI技术为您的心理健康护航
+            </p>
+          </div>
+
+          <div
+            data-aos="fade-up"
+            data-aos-delay="200"
+            class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
+          >
+            <a
+              href="/#/dashboard"
+              class="bg-white text-purple-600 px-12 py-5 rounded-full text-xl font-bold shadow-2xl hover:shadow-xl transition-all duration-300 hover:scale-110 inline-flex items-center space-x-3"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                ></path>
+              </svg>
+              <span>立即开始</span>
+            </a>
+            <a
+              href="https://my.feishu.cn/wiki/DH7gw3RumiZLNikKj6zcKFNpnuh?from=from_copylink"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="border-2 border-white text-white px-12 py-5 rounded-full text-xl font-bold hover:bg-white hover:text-purple-600 transition-all duration-300"
+            >
+              了解更多
+            </a>
+          </div>
+
+          <div
+            data-aos="fade-up"
+            data-aos-delay="400"
+            class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+          >
+            <div class="text-white">
+              <div class="text-4xl font-bold mb-2">免费</div>
+              <div class="text-white opacity-80">基础评估</div>
+            </div>
+            <div class="text-white">
+              <div class="text-4xl font-bold mb-2">24/7</div>
+              <div class="text-white opacity-80">在线服务</div>
+            </div>
+            <div class="text-white">
+              <div class="text-4xl font-bold mb-2">隐私</div>
+              <div class="text-white opacity-80">安全保护</div>
+            </div>
+            <div class="text-white">
+              <div class="text-4xl font-bold mb-2">专业</div>
+              <div class="text-white opacity-80">医学级评估</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 页脚 -->
+      <footer class="bg-gray-900 text-gray-300 py-12">
+        <div class="container mx-auto px-6">
+          <div class="grid gap-8 mb-8 md:grid-cols-4">
+            <div>
+              <div class="flex items-center space-x-2 mb-4">
+                <div
+                  class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center"
+                >
+                  <svg
+                    class="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    ></path>
+                  </svg>
+                </div>
+                <span class="text-xl font-bold text-white">心域智护</span>
+              </div>
+              <p class="text-sm leading-relaxed">
+                智能心理检测与疗愈助手，为您的心理健康护航
+              </p>
+            </div>
+
+            <div
+              class="grid grid-cols-3 gap-6 text-xs sm:text-sm md:col-span-3 md:grid-cols-3"
+            >
+              <div>
+                <h3 class="text-white font-semibold mb-3">产品</h3>
+                <ul class="space-y-2">
+                  <li>
+                    <a
+                      href="#features"
+                      class="hover:text-purple-400 transition-colors"
+                      >产品特色</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#functions"
+                      class="hover:text-purple-400 transition-colors"
+                      >核心功能</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#testimonials"
+                      class="hover:text-purple-400 transition-colors"
+                      >用户评价</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="/#/"
+                      class="hover:text-purple-400 transition-colors"
+                      >立即体验</a
+                    >
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 class="text-white font-semibold mb-3">支持</h3>
+                <ul class="space-y-2">
+                  <li>
+                    <a href="#" class="hover:text-purple-400 transition-colors"
+                      >帮助中心</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#" class="hover:text-purple-400 transition-colors"
+                      >隐私政策</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#" class="hover:text-purple-400 transition-colors"
+                      >服务条款</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#" class="hover:text-purple-400 transition-colors"
+                      >联系我们</a
+                    >
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 class="text-white font-semibold mb-3">联系方式</h3>
+                <ul class="space-y-2">
+                  <li>品牌：心域智护（XinyuCare）</li>
+                  <li>官网：www.gitcc.com</li>
+                  <li>商务合作：请通过官网联系</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-gray-800 pt-8 text-center text-sm">
+            <p>
+              &copy; 2026 XinyuCare All rights reserved.   
+              <br>   
+              由AI技术驱动，为心理健康而生。
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      <!-- 下载弹窗 -->
+      <div id="downloadModal" class="download-modal">
+        <div class="download-modal-content">
+          <button class="download-close" id="closeModal">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+          
+          <h2 class="text-3xl font-bold gradient-text mb-3 text-center">下载 XinyuCare</h2>
+          <p class="text-gray-600 text-center mb-8">选择适合您设备的版本</p>
+          
+          <div class="space-y-3">
+            <!-- Windows -->
+            <a href="https://www.gitcc.com" target="_blank" rel="noopener noreferrer" class="download-option windows">
+              <svg class="download-icon" viewBox="0 0 48 48" fill="none">
+                <rect width="48" height="48" rx="8" fill="#0078D4"/>
+                <path d="M20 14L12 15.5V23.5H20V14Z" fill="white"/>
+                <path d="M36 12L22 14V23.5H36V12Z" fill="white"/>
+                <path d="M20 25.5H12V33.5L20 35V25.5Z" fill="white"/>
+                <path d="M36 25.5H22V35L36 37V25.5Z" fill="white"/>
+              </svg>
+              <div class="download-info">
+                <h3>Windows 版本</h3>
+                <p>心域智护-Windows.zip</p>
+              </div>
+              <svg class="w-6 h-6 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+
+            <!-- Android -->
+            <a href="https://www.gitcc.com" target="_blank" rel="noopener noreferrer" class="download-option android">
+              <svg class="download-icon" viewBox="0 0 48 48" fill="none">
+                <rect width="48" height="48" rx="8" fill="#3DDC84"/>
+                <path d="M14 18C14 16.8954 14.8954 16 16 16H32C33.1046 16 34 16.8954 34 18V32C34 33.1046 33.1046 34 32 34H16C14.8954 34 14 33.1046 14 32V18Z" fill="white"/>
+                <circle cx="20" cy="22" r="1.5" fill="#3DDC84"/>
+                <circle cx="28" cy="22" r="1.5" fill="#3DDC84"/>
+                <path d="M20 28H28" stroke="#3DDC84" stroke-width="2" stroke-linecap="round"/>
+                <path d="M18 14L20 16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <path d="M30 14L28 16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <div class="download-info">
+                <h3>Android 版本</h3>
+                <p>心域智护.apk</p>
+              </div>
+              <svg class="w-6 h-6 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+
+            <!-- iOS -->
+            <a href="https://www.gitcc.com" target="_blank" rel="noopener noreferrer" class="download-option ios">
+              <svg class="download-icon" viewBox="0 0 48 48" fill="none">
+                <rect width="48" height="48" rx="8" fill="#000000"/>
+                <path d="M28.5 14.5C27.5 15.5 26 16 24.5 16C24.3 14.5 25 13 26 12C27 11 28.5 10.5 30 10.5C30.2 12 29.5 13.5 28.5 14.5Z" fill="white"/>
+                <path d="M30 16.5C27.5 16.5 26.5 18 24.5 18C22.5 18 21 16.5 18.5 16.5C16 16.5 13.5 18.5 12.5 21.5C11 25.5 12 32 15.5 36C16.5 37 18 38 19.5 38C21 38 21.5 37 23.5 37C25.5 37 26 38 27.5 38C29 38 30.5 37 31.5 36C33 34.5 34 32.5 34.5 30.5C31.5 29.5 30.5 25.5 33 23C32 20.5 30 16.5 30 16.5Z" fill="white"/>
+              </svg>
+              <div class="download-info">
+                <h3>iPhone 版本</h3>
+                <p>心域智护-ios.ipa</p>
+              </div>
+              <svg class="w-6 h-6 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+
+          <p class="text-sm text-gray-500 text-center mt-6">
+            所有版本均为免费下载使用
+          </p>
+        </div>
+      </div>
+
+      <!-- JavaScript交互 -->
+      <script>
+        // 初始化AOS动画库（容错）
+        try {
+          if (window.AOS && typeof AOS.init === "function") {
+            AOS.init({
+              duration: 800,
+              easing: "ease-in-out",
+              once: true,
+              offset: 100,
+            });
+          }
+        } catch (e) {}
+
+        // 滚动进度条
+        window.addEventListener("scroll", () => {
+          const scrollProgress = document.getElementById("scrollProgress");
+          const scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop;
+          const scrollHeight =
+            document.documentElement.scrollHeight -
+            document.documentElement.clientHeight;
+          const progress = (scrollTop / scrollHeight) * 100;
+          scrollProgress.style.width = progress + "%";
+        });
+
+        // 导航栏滚动效果
+        const navbar = document.getElementById("navbar");
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 50) {
+            navbar.style.boxShadow = "0 4px 20px rgba(0, 0, 0, 0.1)";
+          } else {
+            navbar.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.05)";
+          }
+        });
+
+        // 移动端菜单
+        const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+        const mobileMenu = document.getElementById("mobileMenu");
+        mobileMenuBtn.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
+        });
+
+        // 数字计数动画
+        const counters = document.querySelectorAll(".counter");
+        const speed = 200;
+
+        const animateCounter = (counter) => {
+          const targetStr = counter.getAttribute("data-target");
+          let targetValue, suffix = '', isDecimal = false;
+          
+          // 解析目标值和后缀
+          if (targetStr.includes('万')) {
+            targetValue = parseFloat(targetStr.replace('万', ''));
+            suffix = '万';
+            isDecimal = targetValue < 10; // 小于10万的用小数显示
+          } else if (targetStr.includes('%')) {
+            targetValue = parseFloat(targetStr.replace('%', ''));
+            suffix = '%';
+            isDecimal = true;
+          } else if (targetStr.includes('h')) {
+            targetValue = parseFloat(targetStr.replace('h', ''));
+            suffix = 'h';
+          } else {
+            targetValue = parseFloat(targetStr) || 0;
+          }
+          
+          // 解析当前显示值
+          const currentStr = counter.innerText;
+          let currentValue = 0;
+          
+          if (currentStr !== '0') {
+            if (currentStr.includes('万')) {
+              currentValue = parseFloat(currentStr.replace('万', ''));
+            } else if (currentStr.includes('%')) {
+              currentValue = parseFloat(currentStr.replace('%', ''));
+            } else if (currentStr.includes('h')) {
+              currentValue = parseFloat(currentStr.replace('h', ''));
+            } else {
+              currentValue = parseFloat(currentStr) || 0;
+            }
+          }
+          
+          // 计算增量 - 确保至少有50步动画
+          const steps = Math.max(50, Math.min(100, targetValue * 2));
+          const increment = targetValue / steps;
+
+          if (currentValue < targetValue) {
+            const newValue = Math.min(targetValue, currentValue + increment);
+            
+            // 格式化显示值
+            if (suffix === '万') {
+              if (isDecimal) {
+                counter.innerText = newValue.toFixed(1) + '万';
+              } else {
+                counter.innerText = Math.floor(newValue) + '万';
+              }
+            } else if (suffix === '%') {
+              counter.innerText = newValue.toFixed(1) + '%';
+            } else if (suffix === 'h') {
+              counter.innerText = Math.ceil(newValue) + 'h'; // 使用ceil确保显示
+            } else {
+              counter.innerText = Math.floor(newValue);
+            }
+            
+            setTimeout(() => animateCounter(counter), 30); // 调整动画速度
+          } else {
+            counter.innerText = targetStr; // 确保最终显示目标值
+          }
+        };
+
+        // 监听滚动，当数字进入视线时开始动画
+        const observerOptions = {
+          threshold: 0.5,
+        };
+
+        const counterObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const counter = entry.target;
+              animateCounter(counter);
+              counterObserver.unobserve(counter);
+            }
+          });
+        }, observerOptions);
+
+        counters.forEach((counter) => {
+          counterObserver.observe(counter);
+        });
+
+        // GSAP动画（可选）
+        try {
+          if (window.gsap) {
+            gsap.registerPlugin(window.ScrollTrigger || {});
+            // 特色卡片滚动动画
+            if (gsap.utils && typeof gsap.utils.toArray === "function") {
+              gsap.utils.toArray(".feature-card").forEach((card, index) => {
+                gsap.from(card, {
+                  scrollTrigger: window.ScrollTrigger
+                    ? {
+                        trigger: card,
+                        start: "top 80%",
+                        end: "bottom 20%",
+                        toggleActions: "play none none reverse",
+                      }
+                    : undefined,
+                  opacity: 0,
+                  y: 50,
+                  duration: 0.8,
+                  delay: index * 0.1,
+                });
+              });
+            }
+          }
+        } catch (e) {}
+
+        // 鼠标跟随光效
+        const heroSection = document.getElementById("heroSection");
+        const mouseGlow = document.getElementById("mouseGlow");
+        
+        if (heroSection && mouseGlow) {
+          heroSection.addEventListener("mousemove", (e) => {
+            const rect = heroSection.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            mouseGlow.style.left = x + "px";
+            mouseGlow.style.top = y + "px";
+            mouseGlow.style.opacity = "1";
+          });
+          
+          heroSection.addEventListener("mouseleave", () => {
+            mouseGlow.style.opacity = "0";
+          });
+        }
+
+        // 增强的卡片交互效果
+        document.querySelectorAll('.glass-card').forEach(card => {
+          card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) scale(1.05)';
+            this.style.boxShadow = '0 20px 50px rgba(255, 255, 255, 0.2)';
+          });
+          
+          card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+          });
+        });
+
+        // 移动端检测
+        const isMobile = () => window.innerWidth < 768;
+        
+        // 窗口大小变化时重新应用按钮样式
+        const applyButtonStyles = () => {
+          document.querySelectorAll('.btn-primary, .btn-docs, .btn-download').forEach(button => {
+            if (isMobile()) {
+              // 移动端颜色交换：在线使用(btn-primary)显示红色，产品文档(btn-docs)显示绿色，下载安装(btn-download)显示蓝色
+              if (button.classList.contains('btn-primary')) {
+                // 在线使用按钮在移动端显示红色
+                button.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                button.style.boxShadow = '0 10px 30px rgba(239, 68, 68, 0.3)';
+              } else if (button.classList.contains('btn-docs')) {
+                // 产品文档按钮在移动端显示绿色
+                button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                button.style.boxShadow = '0 10px 30px rgba(16, 185, 129, 0.3)';
+              } else if (button.classList.contains('btn-download')) {
+                // 下载安装按钮在移动端显示蓝色
+                button.style.background = 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)';
+                button.style.boxShadow = '0 10px 30px rgba(59, 130, 246, 0.3)';
+              }
+            } else {
+              // 桌面端保持原始CSS颜色
+              if (button.classList.contains('btn-primary')) {
+                // 在线使用按钮在桌面端保持红色（CSS原始样式）
+                button.style.background = '';
+                button.style.boxShadow = '';
+              } else if (button.classList.contains('btn-docs')) {
+                // 产品文档按钮在桌面端保持绿色（CSS原始样式）
+                button.style.background = '';
+                button.style.boxShadow = '';
+              } else if (button.classList.contains('btn-download')) {
+                // 下载安装按钮在桌面端保持蓝色（CSS原始样式）
+                button.style.background = '';
+                button.style.boxShadow = '';
+              }
+            }
+          });
+        };
+        
+        // 监听窗口大小变化
+        window.addEventListener('resize', applyButtonStyles);
+        
+        // 按钮点击波纹效果增强
+        document.querySelectorAll('.btn-primary, .btn-docs, .btn-download').forEach(button => {
+          // 初始化按钮样式
+          applyButtonStyles();
+          
+          button.addEventListener('click', function(e) {
+            // 创建波纹元素
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+            
+            this.appendChild(ripple);
+            
+            // 按钮震动效果
+            this.style.animation = 'buttonClick 0.3s ease';
+            
+            setTimeout(() => {
+              ripple.remove();
+              this.style.animation = '';
+            }, 600);
+            
+            // 根据按钮类型和设备类型创建不同颜色的成功反馈粒子
+            let particleColors;
+            if (isMobile()) {
+              // 移动端：在线使用(btn-primary)用红色粒子，下载安装(btn-download)用蓝色粒子，产品文档(btn-docs)用绿色粒子
+              if (this.classList.contains('btn-primary')) {
+                particleColors = ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#f87171', '#fca5a5'];
+              } else if (this.classList.contains('btn-download')) {
+                particleColors = ['#3b82f6', '#2563eb', '#1d4ed8', '#8b5cf6', '#7c3aed', '#60a5fa'];
+              } else {
+                particleColors = ['#10b981', '#059669', '#047857', '#065f46', '#34d399', '#6ee7b7'];
+              }
+            } else {
+              // 桌面端：在线使用(btn-primary)用红色粒子，下载安装(btn-download)用蓝色粒子，产品文档(btn-docs)用绿色粒子
+              if (this.classList.contains('btn-primary')) {
+                particleColors = ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#f87171', '#fca5a5'];
+              } else if (this.classList.contains('btn-download')) {
+                particleColors = ['#3b82f6', '#2563eb', '#1d4ed8', '#8b5cf6', '#7c3aed', '#60a5fa'];
+              } else {
+                particleColors = ['#10b981', '#059669', '#047857', '#065f46', '#34d399', '#6ee7b7'];
+              }
+            }
+            
+            for (let i = 0; i < 12; i++) {
+              const particle = document.createElement('div');
+              particle.style.position = 'absolute';
+              particle.style.width = '6px';
+              particle.style.height = '6px';
+              particle.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+              particle.style.borderRadius = '50%';
+              particle.style.pointerEvents = 'none';
+              particle.style.zIndex = '1000';
+              particle.style.boxShadow = `0 0 10px ${particleColors[0]}`;
+              
+              const centerX = rect.left + rect.width / 2;
+              const centerY = rect.top + rect.height / 2;
+              particle.style.left = centerX + 'px';
+              particle.style.top = centerY + 'px';
+              
+              document.body.appendChild(particle);
+              
+              const angle = (i / 12) * Math.PI * 2;
+              const distance = 40 + Math.random() * 30;
+              const duration = 600 + Math.random() * 400;
+              
+              particle.animate([
+                {
+                  transform: 'translate(0, 0) scale(1)',
+                  opacity: 1
+                },
+                {
+                  transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+                  opacity: 0
+                }
+              ], {
+                duration: duration,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+              }).onfinish = () => {
+                particle.remove();
+              };
+            }
+          });
+          
+          // 只在桌面端禁用动态颜色变化，移动端保持交互效果
+          if (!isMobile()) {
+            // 桌面端：移除所有动态颜色变化事件监听器，保持原始颜色
+            return;
+          }
+          
+          // 移动端：保持颜色交互效果
+          // 鼠标悬停时的颜色渐变动画（移动端）
+          button.addEventListener('mouseenter', function() {
+            if (this.classList.contains('btn-primary')) {
+              // 移动端在线使用按钮悬停时的红色效果
+              this.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%)';
+              this.style.boxShadow = '0 15px 35px rgba(239, 68, 68, 0.5), 0 0 20px rgba(248, 113, 113, 0.3)';
+            } else if (this.classList.contains('btn-download')) {
+              // 移动端下载安装按钮悬停时的蓝色效果
+              this.style.background = 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)';
+              this.style.boxShadow = '0 15px 35px rgba(59, 130, 246, 0.5), 0 0 20px rgba(96, 165, 250, 0.3)';
+            } else if (this.classList.contains('btn-docs')) {
+              // 移动端产品文档按钮悬停时的绿色效果
+              this.style.background = 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #047857 100%)';
+              this.style.boxShadow = '0 15px 35px rgba(16, 185, 129, 0.5), 0 0 20px rgba(52, 211, 153, 0.3)';
+            }
+
+            this.style.filter = 'brightness(1.1) saturate(1.2)';
+          });
+
+          button.addEventListener('mouseleave', function() {
+            if (this.classList.contains('btn-primary')) {
+              // 移动端在线使用按钮恢复红色
+              this.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+              this.style.boxShadow = '0 10px 30px rgba(239, 68, 68, 0.3)';
+            } else if (this.classList.contains('btn-download')) {
+              // 移动端下载安装按钮恢复蓝色
+              this.style.background = 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)';
+              this.style.boxShadow = '0 10px 30px rgba(59, 130, 246, 0.3)';
+            } else if (this.classList.contains('btn-docs')) {
+              // 移动端产品文档按钮恢复绿色
+              this.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+              this.style.boxShadow = '0 10px 30px rgba(16, 185, 129, 0.3)';
+            }
+
+            this.style.filter = 'brightness(1) saturate(1)';
+          });
+
+          // 鼠标按下时的效果（移动端）
+          button.addEventListener('mousedown', function() {
+            if (this.classList.contains('btn-primary')) {
+              // 移动端在线使用按钮按下时的深红色效果
+              this.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+              this.style.boxShadow = '0 5px 15px rgba(239, 68, 68, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.1)';
+            } else if (this.classList.contains('btn-download')) {
+              // 移动端下载安装按钮按下时的深蓝色效果
+              this.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)';
+              this.style.boxShadow = '0 5px 15px rgba(59, 130, 246, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.1)';
+            } else if (this.classList.contains('btn-docs')) {
+              // 移动端产品文档按钮按下时的深绿色效果
+              this.style.background = 'linear-gradient(135deg, #047857 0%, #065f46 100%)';
+              this.style.boxShadow = '0 5px 15px rgba(16, 185, 129, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.1)';
+            }
+
+            this.style.transform = 'translateY(-2px) scale(0.98)';
+          });
+
+          button.addEventListener('mouseup', function() {
+            this.style.transform = 'translateY(-6px) scale(1.05)';
+          });
+        });
+
+        // 顶部图片轮播功能 - 已禁用
+        const DISABLE_HERO_CAROUSEL = true;
+        const heroImageCarousel = document.getElementById('heroImageCarousel');
+        const heroImageLoader = document.getElementById('heroImageLoader');
+        
+        // 图片文件名列表
+        const imageFileNames = [
+          '喜悦恋爱_1.png', '喜悦恋爱_2.png', '喜悦恋爱_3.png', '喜悦恋爱_4.png',
+          '开心_1.png', '开心_2.png', '开心_3.png', '开心_4.png',
+          '治愈温暖_1.png', '治愈温暖_2.png', '治愈温暖_3.png', '治愈温暖_4.png',
+          '惊讶_1.png', '惊讶_2.png', '惊讶_3.png', '惊讶_4.png',
+          '困倦_1.png', '困倦_2.png', '困倦_3.png', '困倦_4.png',
+          '悲伤_1.png', '悲伤_2.png', '悲伤_3.png', '悲伤_4.png',
+          '生气_1.png', '生气_2.png', '生气_3.png', '生气_4.png',
+          '害怕_1.png', '害怕_2.png', '害怕_3.png', '害怕_4.png',
+          '厌恶_1.png', '厌恶_2.png', '厌恶_3.png', '厌恶_4.png',
+          '绝望_1.png', '绝望_2.png', '绝望_3.png', '绝望_4.png'
+        ];
+        
+        // 可能的路径前缀
+        const possiblePaths = [
+          '/srcs/enjoy/',
+        ];
+        
+        let heroImageList = [];
+        let heroCurrentImageIndex = 0;
+        let heroPreloadedImages = new Map();
+        let heroCarouselInterval;
+        let workingPath = null;
+        
+        // 预加载图片函数 - 简化版本
+        function heroPreloadImage(src) {
+          return new Promise((resolve, reject) => {
+            if (heroPreloadedImages.has(src)) {
+              resolve(heroPreloadedImages.get(src));
+              return;
+            }
+            
+            const img = new Image();
+            img.onload = () => {
+              heroPreloadedImages.set(src, img);
+              resolve(img);
+            };
+            img.onerror = reject;
+            img.src = encodeURI(src) + '?v=20260212';
+          });
+        }
+        
+        // 查找可用的路径
+        async function findWorkingPath() {
+          console.log('🔍 开始查找可用的图片路径...');
+          
+          // 测试用的图片文件
+          const testFiles = ['开心_1.png', '治愈温暖_1.png', '喜悦恋爱_1.png'];
+          
+          for (const path of possiblePaths) {
+            console.log('测试路径:', path);
+            let successCount = 0;
+            
+            for (const fileName of testFiles) {
+              try {
+                await heroPreloadImage(path + fileName);
+                successCount++;
+                console.log('✅', path + fileName);
+              } catch (error) {
+                console.log('❌', path + fileName);
+              }
+            }
+            
+            if (successCount >= 2) { // 至少2张图片成功
+              console.log('🎉 找到可用路径:', path);
+              workingPath = path;
+              return true;
+            }
+          }
+          
+          console.log('😞 没有找到可用的路径');
+          return false;
+        }
+        
+        // 构建完整的图片列表
+        function buildImageList() {
+          if (!workingPath) return [];
+          
+          heroImageList = imageFileNames.map(fileName => workingPath + fileName);
+          console.log('📋 构建图片列表完成，共', heroImageList.length, '张图片');
+          return heroImageList;
+        }
+        
+        // 显示图片 - 简化版本
+        function heroShowImage(imageSrc, immediate = false) {
+          // 隐藏加载指示器
+          if (heroImageLoader) {
+            heroImageLoader.style.display = 'none';
+          }
+          
+          // 移除旧图片
+          const oldImages = heroImageCarousel.querySelectorAll('.hero-carousel-image');
+          oldImages.forEach(img => {
+            img.classList.remove('active');
+            setTimeout(() => {
+              if (img.parentNode) {
+                img.parentNode.removeChild(img);
+              }
+            }, immediate ? 0 : 1000);
+          });
+          
+          // 创建新图片
+          const imgElement = document.createElement('img');
+          imgElement.src = imageSrc;
+          imgElement.className = 'hero-carousel-image';
+          imgElement.alt = '情绪表达图片';
+          
+          imgElement.onload = () => {
+            console.log('🖼️ 图片显示成功:', imageSrc.split('/').pop());
+          };
+          
+          imgElement.onerror = () => {
+            console.error('❌ 图片显示失败:', imageSrc);
+            setTimeout(() => heroNextImage(), 1000);
+          };
+          
+          // 添加到容器并显示
+          heroImageCarousel.appendChild(imgElement);
+          
+          if (immediate) {
+            imgElement.classList.add('active');
+          } else {
+            setTimeout(() => {
+              imgElement.classList.add('active');
+            }, 100);
+          }
+        }
+        
+        // 切换到下一张图片
+        async function heroNextImage() {
+          if (heroImageList.length === 0) return;
+          
+          heroCurrentImageIndex = (heroCurrentImageIndex + 1) % heroImageList.length;
+          const nextImageSrc = heroImageList[heroCurrentImageIndex];
+          
+          try {
+            await heroPreloadImage(nextImageSrc);
+            heroShowImage(nextImageSrc);
+            
+            // 预加载下一张
+            const preloadIndex = (heroCurrentImageIndex + 1) % heroImageList.length;
+            heroPreloadImage(heroImageList[preloadIndex]).catch(() => {});
+            
+          } catch (error) {
+            console.warn('⚠️ 图片加载失败，跳过:', nextImageSrc.split('/').pop());
+            setTimeout(() => heroNextImage(), 500);
+          }
+        }
+        
+        // 随机选择起始图片
+        function getRandomStartIndex() {
+          return Math.floor(Math.random() * heroImageList.length);
+        }
+        
+        // 初始化轮播 - 简化版本
+        async function heroInitCarousel() {
+          if (!heroImageCarousel) {
+            console.error('❌ 轮播容器未找到');
+            return;
+          }
+          
+          console.log('🚀 初始化顶部图片轮播...');
+          
+          // 查找可用路径
+          const pathFound = await findWorkingPath();
+          
+          if (pathFound) {
+            // 构建图片列表
+            buildImageList();
+            
+            if (heroImageList.length > 0) {
+              // 随机选择起始图片
+              heroCurrentImageIndex = getRandomStartIndex();
+              
+              // 显示第一张图片
+              const firstImage = heroImageList[heroCurrentImageIndex];
+              try {
+                await heroPreloadImage(firstImage);
+                heroShowImage(firstImage, true);
+                
+                // 开始轮播
+                heroCarouselInterval = setInterval(heroNextImage, 7000);
+                console.log('✅ 轮播启动成功！');
+                
+              } catch (error) {
+                console.error('❌ 首张图片加载失败:', error);
+                hideCarousel();
+              }
+            } else {
+              console.error('❌ 图片列表为空');
+              hideCarousel();
+            }
+          } else {
+            console.error('❌ 没有找到可用的图片路径');
+            hideCarousel();
+          }
+        }
+        
+        // 隐藏轮播容器
+        function hideCarousel() {
+          if (!heroImageCarousel) return;
+          console.log('🙈 顶部轮播使用占位图');
+          // 清理旧内容
+          heroImageCarousel.innerHTML = '';
+          // 显示占位图（公共目录下的标志）
+          const fallback = document.createElement('img');
+          fallback.src = '/images/logo/logo-icon.svg';
+          fallback.alt = 'XinyuCare';
+          fallback.className = 'hero-carousel-image active';
+          heroImageCarousel.appendChild(fallback);
+        }
+        
+        // 页面可见性变化处理
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            if (heroCarouselInterval) {
+              clearInterval(heroCarouselInterval);
+            }
+          } else {
+            if (!heroCarouselInterval && heroImageCarousel && heroImageList.length > 0) {
+              heroCarouselInterval = setInterval(heroNextImage, 7000);
+            }
+          }
+        });
+        
+        // 启动顶部轮播（禁用）
+        if (DISABLE_HERO_CAROUSEL) {
+          hideCarousel();
+        } else {
+          heroInitCarousel();
+        }
+        
+        // 简化的调试信息
+        setTimeout(() => {
+          console.log('=== 🎭 图片轮播状态 ===');
+          console.log('容器状态:', heroImageCarousel ? '✅' : '❌');
+          console.log('工作路径:', workingPath || '❌ 未找到');
+          console.log('图片数量:', heroImageList.length);
+          console.log('轮播状态:', heroCarouselInterval ? '✅ 运行中' : '❌ 未启动');
+          console.log('缓存图片:', heroPreloadedImages.size, '张');
+        }, 3000);
+
+        // 颜色交互演示功能
+        function createColorDemo() {
+          const buttons = document.querySelectorAll('.btn-primary, .btn-docs');
+          
+          buttons.forEach(button => {
+            // 添加颜色变化指示器
+            const colorIndicator = document.createElement('div');
+            colorIndicator.style.position = 'absolute';
+            colorIndicator.style.top = '-8px';
+            colorIndicator.style.right = '-8px';
+            colorIndicator.style.width = '16px';
+            colorIndicator.style.height = '16px';
+            colorIndicator.style.borderRadius = '50%';
+            colorIndicator.style.border = '2px solid white';
+            colorIndicator.style.zIndex = '10';
+            colorIndicator.style.transition = 'all 0.3s ease';
+            
+            const isGreenButton = button.classList.contains('btn-primary');
+            colorIndicator.style.background = isGreenButton ? '#10b981' : '#ef4444';
+            
+            button.style.position = 'relative';
+            button.appendChild(colorIndicator);
+            
+            // 鼠标悬停时改变指示器颜色
+            button.addEventListener('mouseenter', function() {
+              colorIndicator.style.background = isGreenButton ? '#34d399' : '#f87171';
+              colorIndicator.style.transform = 'scale(1.2)';
+              colorIndicator.style.boxShadow = `0 0 15px ${isGreenButton ? '#10b981' : '#ef4444'}`;
+            });
+            
+            button.addEventListener('mouseleave', function() {
+              colorIndicator.style.background = isGreenButton ? '#10b981' : '#ef4444';
+              colorIndicator.style.transform = 'scale(1)';
+              colorIndicator.style.boxShadow = 'none';
+            });
+            
+            // 点击时的颜色爆炸效果
+            button.addEventListener('click', function() {
+              colorIndicator.style.transform = 'scale(0)';
+              setTimeout(() => {
+                colorIndicator.style.transform = 'scale(1.5)';
+                setTimeout(() => {
+                  colorIndicator.style.transform = 'scale(1)';
+                }, 200);
+              }, 100);
+            });
+          });
+        }
+        
+        // 初始化颜色演示
+        setTimeout(createColorDemo, 1000);
+        
+        // 自动颜色循环演示（可选）
+        function startColorCycle() {
+          const buttons = document.querySelectorAll('.btn-primary, .btn-docs');
+          let cycleIndex = 0;
+          
+          setInterval(() => {
+            buttons.forEach((button, index) => {
+              if (index === cycleIndex % buttons.length) {
+                // 触发悬停效果
+                button.dispatchEvent(new Event('mouseenter'));
+                setTimeout(() => {
+                  button.dispatchEvent(new Event('mouseleave'));
+                }, 1500);
+              }
+            });
+            cycleIndex++;
+          }, 3000);
+        }
+        
+        // 5秒后开始自动颜色循环演示
+        setTimeout(startColorCycle, 5000);
+        const launchBadge = document.getElementById("launchBadge");
+        if (launchBadge) {
+          // 点击徽章特效
+          launchBadge.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 创建爆炸粒子效果
+            for (let i = 0; i < 12; i++) {
+              const particle = document.createElement('div');
+              particle.style.position = 'absolute';
+              particle.style.width = '6px';
+              particle.style.height = '6px';
+              particle.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+              particle.style.borderRadius = '50%';
+              particle.style.pointerEvents = 'none';
+              particle.style.zIndex = '1000';
+              
+              const rect = this.getBoundingClientRect();
+              particle.style.left = (rect.left + rect.width / 2) + 'px';
+              particle.style.top = (rect.top + rect.height / 2) + 'px';
+              
+              document.body.appendChild(particle);
+              
+              // 随机方向和距离
+              const angle = (i / 12) * Math.PI * 2;
+              const distance = 50 + Math.random() * 50;
+              const duration = 800 + Math.random() * 400;
+              
+              particle.animate([
+                {
+                  transform: 'translate(0, 0) scale(1)',
+                  opacity: 1
+                },
+                {
+                  transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+                  opacity: 0
+                }
+              ], {
+                duration: duration,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+              }).onfinish = () => {
+                particle.remove();
+              };
+            }
+            
+            // 徽章震动效果
+            this.style.animation = 'none';
+            setTimeout(() => {
+              this.style.animation = 'badgeShake 0.5s ease-in-out, badgePulse 2s ease-in-out infinite, badgeFloat 4s ease-in-out infinite';
+            }, 10);
+          });
+          
+          // 鼠标进入徽章时的额外效果
+          launchBadge.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.15) rotate(10deg)';
+            this.style.filter = 'brightness(1.2) saturate(1.3)';
+          });
+          
+          launchBadge.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1) rotate(0deg)';
+            this.style.filter = 'brightness(1) saturate(1)';
+          });
+        }
+
+        // 滚动视差效果
+        window.addEventListener('scroll', () => {
+          const scrolled = window.pageYOffset;
+          const parallax = document.querySelectorAll('.float-animation');
+          const speed = 0.5;
+          
+          parallax.forEach(element => {
+            const yPos = -(scrolled * speed);
+            element.style.transform = `translateY(${yPos}px)`;
+          });
+        });
+
+        // 下载弹窗交互
+        const downloadBtn = document.getElementById('downloadBtn');
+        const downloadModal = document.getElementById('downloadModal');
+        const closeModal = document.getElementById('closeModal');
+
+        // 打开弹窗
+        if (downloadBtn) {
+          downloadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            downloadModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // 按钮点击粒子效果
+            const rect = downloadBtn.getBoundingClientRect();
+            const particleColors = ['#3b82f6', '#2563eb', '#1d4ed8', '#8b5cf6', '#7c3aed', '#60a5fa'];
+            
+            for (let i = 0; i < 12; i++) {
+              const particle = document.createElement('div');
+              particle.style.position = 'absolute';
+              particle.style.width = '6px';
+              particle.style.height = '6px';
+              particle.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+              particle.style.borderRadius = '50%';
+              particle.style.pointerEvents = 'none';
+              particle.style.zIndex = '1000';
+              particle.style.boxShadow = `0 0 10px ${particleColors[0]}`;
+              
+              const centerX = rect.left + rect.width / 2;
+              const centerY = rect.top + rect.height / 2;
+              particle.style.left = centerX + 'px';
+              particle.style.top = centerY + 'px';
+              
+              document.body.appendChild(particle);
+              
+              const angle = (i / 12) * Math.PI * 2;
+              const distance = 40 + Math.random() * 30;
+              const duration = 600 + Math.random() * 400;
+              
+              particle.animate([
+                {
+                  transform: 'translate(0, 0) scale(1)',
+                  opacity: 1
+                },
+                {
+                  transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+                  opacity: 0
+                }
+              ], {
+                duration: duration,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+              }).onfinish = () => {
+                particle.remove();
+              };
+            }
+          });
+        }
+
+        // 关闭弹窗
+        if (closeModal) {
+          closeModal.addEventListener('click', () => {
+            downloadModal.classList.remove('active');
+            document.body.style.overflow = '';
+          });
+        }
+
+        // 点击背景关闭弹窗
+        if (downloadModal) {
+          downloadModal.addEventListener('click', (e) => {
+            if (e.target === downloadModal) {
+              downloadModal.classList.remove('active');
+              document.body.style.overflow = '';
+            }
+          });
+        }
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && downloadModal.classList.contains('active')) {
+            downloadModal.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+
+        // 下载选项点击效果
+        document.querySelectorAll('.download-option').forEach(option => {
+          option.addEventListener('click', function(e) {
+            // 创建下载成功提示
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.top = '20px';
+            toast.style.right = '20px';
+            toast.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            toast.style.color = 'white';
+            toast.style.padding = '16px 24px';
+            toast.style.borderRadius = '12px';
+            toast.style.boxShadow = '0 10px 30px rgba(16, 185, 129, 0.3)';
+            toast.style.zIndex = '10000';
+            toast.style.fontWeight = '600';
+            toast.style.animation = 'slideInRight 0.3s ease';
+            toast.textContent = '正在跳转到下载页面...';
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+              toast.style.animation = 'slideOutRight 0.3s ease';
+              setTimeout(() => toast.remove(), 300);
+            }, 2000);
+          });
+        });
+
+        // 添加toast动画
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes slideInRight {
+            from {
+              transform: translateX(400px);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          @keyframes slideOutRight {
+            from {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            to {
+              transform: translateX(400px);
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      </script>
+    </div>
+    <div id="root"></div>
+    
+    <!-- 左下角固定背景图片 -->
+    <div class="fixed-bottom-left-bg">
+      <img src="/bg.png" alt="背景装饰" />
+    </div>
+    
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      (function () {
+        const landing = document.getElementById("landing");
+        const root = document.getElementById("root");
+        const doctorBg = document.querySelector(".fixed-bottom-left-bg");
+        const syncView = () => {
+          const isApp = !!location.hash && location.hash.startsWith("#/");
+          if (landing) landing.style.display = isApp ? "none" : "";
+          if (root) root.style.display = isApp ? "" : "none";
+          // 只在官网宣传页显示医生图片，进入应用后隐藏
+          if (doctorBg) doctorBg.style.display = isApp ? "none" : "";
+        };
+        window.addEventListener("hashchange", syncView);
+        syncView();
+      })();
+    </script>
+  </body>
+</html>
