@@ -1,4 +1,5 @@
 import ky from 'ky';
+import { innerApiPath } from './internal-api';
 
 export interface SiliconFlowTranscriptionResponse {
   text: string;
@@ -12,7 +13,7 @@ export async function transcribeAudio(audioFile: File | Blob, model: 'TeleAI/Tel
   formData.append('model', model);
 
   try {
-    const resp = await ky.post('/innerapi/v1/siliconflow/audio/transcriptions', {
+    const resp = await ky.post(innerApiPath('/innerapi/v1/siliconflow/audio/transcriptions'), {
       body: formData,
       timeout: 60000,
       throwHttpErrors: false

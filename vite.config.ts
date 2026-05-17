@@ -33,6 +33,12 @@ export default defineConfig(({ mode }) => {
 
           server.middlewares.use((req, _res, next) => {
             const url = req.url || '';
+            if (url.startsWith(`${normalizedBase}/innerapi/`)) {
+              req.url = url.slice(normalizedBase.length);
+              next();
+              return;
+            }
+
             const shouldRewrite =
               !url.startsWith(normalizedBase) &&
               (

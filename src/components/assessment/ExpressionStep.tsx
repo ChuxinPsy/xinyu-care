@@ -122,6 +122,11 @@ export default function ExpressionStep({ onComplete }: ExpressionStepProps) {
 
   const startCamera = async () => {
     try {
+      if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+        toast.error('当前远程 HTTP 页面无法开启摄像头，请使用 HTTPS 访问');
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } } 
       });
@@ -140,7 +145,7 @@ export default function ExpressionStep({ onComplete }: ExpressionStepProps) {
       };
       updateFps();
     } catch (error) {
-      toast.error('无法启动摄像头，请授予权限');
+      toast.error('无法启动摄像头，请检查浏览器权限或改用 HTTPS 访问');
     }
   };
 

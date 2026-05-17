@@ -43,6 +43,11 @@ export default function VoiceStep({ onComplete }: VoiceStepProps) {
 
   const startRecording = async () => {
     try {
+      if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+        toast.error('当前远程 HTTP 页面无法开启麦克风，请使用 HTTPS 或上传音频文件');
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
@@ -85,7 +90,7 @@ export default function VoiceStep({ onComplete }: VoiceStepProps) {
       
       toast.success('正在实时采集语音特征...');
     } catch (error) {
-      toast.error('无法开启麦克风，请检查权限');
+      toast.error('无法开启麦克风，请检查浏览器权限或改用 HTTPS 访问');
     }
   };
 

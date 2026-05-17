@@ -1,4 +1,5 @@
 import ky from 'ky';
+import { innerApiPath } from './internal-api';
 
 /**
  * 格式化 AI 回复文本
@@ -59,7 +60,7 @@ export async function modelScopeChatCompletion(
 
     // 使用流式响应
     if (body.stream) {
-      const response = await fetch('/innerapi/v1/modelscope/chat/completions', {
+      const response = await fetch(innerApiPath('/innerapi/v1/modelscope/chat/completions'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,7 +108,7 @@ export async function modelScopeChatCompletion(
     }
 
     // 非流式响应
-    const res = await ky.post('/innerapi/v1/modelscope/chat/completions', {
+    const res = await ky.post(innerApiPath('/innerapi/v1/modelscope/chat/completions'), {
       json: body,
       timeout,
       throwHttpErrors: false,
@@ -141,7 +142,7 @@ export async function modelScopeChat(payload: { model: string; messages: ModelSc
       temperature: 0.2,
       max_tokens: 128
     };
-    const res = await ky.post('/innerapi/v1/modelscope/chat/completions', {
+    const res = await ky.post(innerApiPath('/innerapi/v1/modelscope/chat/completions'), {
       json: body,
       timeout: 30000,
       throwHttpErrors: false
@@ -156,7 +157,7 @@ export async function modelScopeChat(payload: { model: string; messages: ModelSc
       const msg = typeof rawMsg === 'string' ? rawMsg : JSON.stringify(rawMsg);
       const code = isJson ? (data?.code || '') : '';
       if (res.status === 400 && typeof code === 'string' && code === '-20081') {
-        const smallRes = await ky.post('/innerapi/v1/modelscope/chat/completions', {
+        const smallRes = await ky.post(innerApiPath('/innerapi/v1/modelscope/chat/completions'), {
           json: { ...body, max_tokens: 64, temperature: 0 },
           timeout: 30000,
           throwHttpErrors: false
@@ -207,7 +208,7 @@ export async function modelScopeVisionChat(
         max_tokens: 200, // 减少token以加快响应
       };
       
-      const res = await ky.post('/innerapi/v1/modelscope/chat/completions', {
+      const res = await ky.post(innerApiPath('/innerapi/v1/modelscope/chat/completions'), {
         json: body,
         timeout: timeout,
         throwHttpErrors: false,

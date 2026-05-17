@@ -1,11 +1,12 @@
 import ky from 'ky';
+import { innerApiPath } from './internal-api';
 
 export interface VolcContentText { type: 'input_text'; text: string }
 export interface VolcContentImage { type: 'input_image'; image_url: string }
 export interface VolcMessage { role: 'user' | 'system' | 'assistant'; content: Array<VolcContentText | VolcContentImage> }
 
 export async function volcResponses(payload: { model: string; input: VolcMessage[] }) {
-  const resp = await ky.post('/innerapi/v1/volc/responses', {
+  const resp = await ky.post(innerApiPath('/innerapi/v1/volc/responses'), {
     json: payload,
     timeout: 90000,
     throwHttpErrors: false

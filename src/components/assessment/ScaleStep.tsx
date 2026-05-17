@@ -729,6 +729,11 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
 
   const startVoiceInput = async () => {
     try {
+      if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+        toast.error('当前远程 HTTP 页面无法开启麦克风，请使用 HTTPS 访问');
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
       streamRef.current = stream;
       const mr = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
