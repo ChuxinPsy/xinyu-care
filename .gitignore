@@ -4,8 +4,10 @@
 node_modules/
 dist/
 dist-ssr/
+.dist/
 output/
 coverage/
+.pnpm-home/
 *.tsbuildinfo
 
 # Lockfiles not used by this project (pnpm workspace)

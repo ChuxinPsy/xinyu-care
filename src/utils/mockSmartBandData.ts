@@ -147,7 +147,7 @@ export const generateTrendData = (
   days: number,
   type: 'heart_rate' | 'sleep' | 'steps' | 'stress' | 'blood_oxygen' | 'temperature'
 ) => {
-  const data = [];
+  const data: Array<{ date: string; value: number }> = [];
   const today = new Date();
 
   for (let i = days - 1; i >= 0; i--) {

@@ -29,7 +29,7 @@ export default function EmotionCamera({ onClose, onEmotionDetected }: EmotionCam
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);

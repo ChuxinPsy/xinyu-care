@@ -25,7 +25,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
   const handleLogoClick = () => {
     // 跳转到官网首页
-    window.location.href = '/index.html';
+    window.location.href = window.location.pathname || '/';
   };
 
   return (

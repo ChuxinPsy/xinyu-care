@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       const uid = session?.user?.id;
       if (uid) {
-        await supabase.rpc('link_username_to_user', { uid, uname: username });
+        await (supabase.rpc as any)('link_username_to_user', { uid, uname: username });
       }
       return { error: null };
     } catch (error) {
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       const uid = session?.user?.id;
       if (uid) {
-        await supabase.rpc('link_username_to_user', { uid, uname: username });
+        await (supabase.rpc as any)('link_username_to_user', { uid, uname: username });
         
         // 如果是医生注册，标记验证码已使用
         if (desiredRole === 'doctor' && verificationCode) {

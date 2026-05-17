@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/db/supabase';
 import { transcribeAudio } from '@/db/siliconflow';
 import { convertWebmToWav } from '@/utils/audio';
 

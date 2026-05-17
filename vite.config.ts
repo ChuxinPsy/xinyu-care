@@ -10,11 +10,45 @@ export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   // Set the third parameter to '' to load all envs regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), '');
+  const base = env.VITE_BASE_PATH || './';
 
   return {
-    base: '/',
+    base,
     publicDir: 'public',
     plugins: [
+      {
+        name: 'code-server-proxy-base-compat',
+        configureServer(server) {
+          const normalizedBase = base.startsWith('/') && base.endsWith('/')
+            ? base.slice(0, -1)
+            : '';
+
+          if (!normalizedBase) return;
+
+          server.middlewares.use((req, _res, next) => {
+            const url = req.url || '';
+            const shouldRewrite =
+              !url.startsWith(normalizedBase) &&
+              (
+                url.startsWith('/@') ||
+                url.startsWith('/src/') ||
+                url.startsWith('/node_modules/') ||
+                url.startsWith('/images/') ||
+                url.startsWith('/assets/') ||
+                url === '/bg.png' ||
+                url === '/sh.png' ||
+                url === '/favicon.png' ||
+                url === '/temple_run_2_icon.png'
+              );
+
+            if (shouldRewrite) {
+              req.url = `${normalizedBase}${url}`;
+            }
+
+            next();
+          });
+        },
+      },
       react(),
       svgr({
         svgrOptions: {

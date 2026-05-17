@@ -28,8 +28,8 @@ export default function VoiceStep({ onComplete }: VoiceStepProps) {
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const pauseTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pauseTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -105,7 +105,7 @@ export default function VoiceStep({ onComplete }: VoiceStepProps) {
     
     // 使用全部频率数据，确保左右都有波动
     const totalBars = 50;
-    const newWave = [];
+    const newWave: number[] = [];
     
     for (let i = 0; i < totalBars; i++) {
       // 从频率数据的不同位置采样，确保覆盖全频段

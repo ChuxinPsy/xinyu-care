@@ -120,7 +120,7 @@ export function useSmartBand({ userId, useMockData = true }: UseSmartBandOptions
 
   // 处理心率数据
   const handleHeartRateMeasurement = useCallback((event: Event) => {
-    const value = (event.target as BluetoothRemoteGATTCharacteristic).value;
+    const value = (event.target as unknown as BluetoothRemoteGATTCharacteristic).value;
     if (!value) return;
     
     // 解析心率数据（GATT标准格式）
