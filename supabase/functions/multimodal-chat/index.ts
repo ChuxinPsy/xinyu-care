@@ -18,23 +18,39 @@ Deno.serve(async (req) => {
       );
     }
 
-    const apiKey = Deno.env.get('INTEGRATIONS_API_KEY');
+    const openRouterKey = Deno.env.get('OPENROUTER_API_KEY');
+    const apiKey = openRouterKey || Deno.env.get('INTEGRATIONS_API_KEY');
     if (!apiKey) {
       return new Response(
-        JSON.stringify({ error: 'API密钥未配置' }),
+        JSON.stringify({ error: 'OPENROUTER_API_KEY或INTEGRATIONS_API_KEY未配置' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const response = await fetch(
-      'https://app-97zabxvzebcx-api-k93RZBjPykEa-gateway.appmiaoda.com/v2/chat/completions',
+      openRouterKey
+        ? 'https://openrouter.ai/api/v1/chat/completions'
+        : 'https://app-97zabxvzebcx-api-k93RZBjPykEa-gateway.appmiaoda.com/v2/chat/completions',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Gateway-Authorization': `Bearer ${apiKey}`,
+          ...(openRouterKey
+            ? {
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': Deno.env.get('OPENROUTER_SITE_URL') || 'http://localhost:5173',
+                'X-Title': Deno.env.get('OPENROUTER_APP_NAME') || 'XinyuCare',
+              }
+            : { 'X-Gateway-Authorization': `Bearer ${apiKey}` }),
         },
-        body: JSON.stringify({ messages }),
+        body: JSON.stringify(openRouterKey
+          ? {
+              model: Deno.env.get('OPENROUTER_VISION_MODEL') || 'qwen/qwen2.5-vl-72b-instruct',
+              messages,
+              stream: true,
+              max_tokens: 512,
+            }
+          : { messages }),
       }
     );
 

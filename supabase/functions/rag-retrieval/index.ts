@@ -20,10 +20,11 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const apiKey = Deno.env.get('INTEGRATIONS_API_KEY');
+    const openRouterKey = Deno.env.get('OPENROUTER_API_KEY');
+    const apiKey = openRouterKey || Deno.env.get('INTEGRATIONS_API_KEY');
     
     if (!apiKey) {
-      throw new Error('INTEGRATIONS_API_KEY未配置');
+      throw new Error('OPENROUTER_API_KEY或INTEGRATIONS_API_KEY未配置');
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -112,19 +113,29 @@ ${conversation_history.length === 0
 
     // 5. 调用AI生成回复
     const response = await fetch(
-      'https://app-97zabxvzebcx-api-zYkZz8qovQ1L-gateway.appmiaoda.com/v2/chat/completions',
+      openRouterKey
+        ? 'https://openrouter.ai/api/v1/chat/completions'
+        : 'https://app-97zabxvzebcx-api-zYkZz8qovQ1L-gateway.appmiaoda.com/v2/chat/completions',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Gateway-Authorization': `Bearer ${apiKey}`,
+          ...(openRouterKey
+            ? {
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': Deno.env.get('OPENROUTER_SITE_URL') || 'http://localhost:5173',
+                'X-Title': Deno.env.get('OPENROUTER_APP_NAME') || 'XinyuCare',
+              }
+            : { 'X-Gateway-Authorization': `Bearer ${apiKey}` }),
         },
         body: JSON.stringify({
+          ...(openRouterKey ? { model: Deno.env.get('OPENROUTER_TEXT_MODEL') || 'deepseek/deepseek-chat-v3-0324' } : {}),
           messages: [
             { role: 'system', content: systemPrompt },
             ...conversation_history,
             { role: 'user', content: query },
           ],
+          ...(openRouterKey ? { stream: false, max_tokens: 512 } : {}),
         }),
       }
     );

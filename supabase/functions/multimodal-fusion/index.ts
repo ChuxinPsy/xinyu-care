@@ -23,10 +23,11 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const apiKey = Deno.env.get('INTEGRATIONS_API_KEY');
+    const openRouterKey = Deno.env.get('OPENROUTER_API_KEY');
+    const apiKey = openRouterKey || Deno.env.get('INTEGRATIONS_API_KEY');
     
     if (!apiKey) {
-      throw new Error('INTEGRATIONS_API_KEY未配置');
+      throw new Error('OPENROUTER_API_KEY或INTEGRATIONS_API_KEY未配置');
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -138,18 +139,28 @@ ${Object.entries(symptoms).map(([key, value]) => `- ${key}: ${value}/10`).join('
 报告要客观专业,同时给予用户关怀和希望。`;
 
     const reportResponse = await fetch(
-      'https://app-97zabxvzebcx-api-zYkZz8qovQ1L-gateway.appmiaoda.com/v2/chat/completions',
+      openRouterKey
+        ? 'https://openrouter.ai/api/v1/chat/completions'
+        : 'https://app-97zabxvzebcx-api-zYkZz8qovQ1L-gateway.appmiaoda.com/v2/chat/completions',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Gateway-Authorization': `Bearer ${apiKey}`,
+          ...(openRouterKey
+            ? {
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': Deno.env.get('OPENROUTER_SITE_URL') || 'http://localhost:5173',
+                'X-Title': Deno.env.get('OPENROUTER_APP_NAME') || 'XinyuCare',
+              }
+            : { 'X-Gateway-Authorization': `Bearer ${apiKey}` }),
         },
         body: JSON.stringify({
+          ...(openRouterKey ? { model: Deno.env.get('OPENROUTER_TEXT_MODEL') || 'deepseek/deepseek-chat-v3-0324' } : {}),
           messages: [
             { role: 'system', content: '你是专业的心理评估专家' },
             { role: 'user', content: analysisPrompt },
           ],
+          ...(openRouterKey ? { stream: false, max_tokens: 700 } : {}),
         }),
       }
     );
@@ -157,7 +168,10 @@ ${Object.entries(symptoms).map(([key, value]) => `- ${key}: ${value}/10`).join('
     let detailedReport = '评估报告生成中...';
     if (reportResponse.ok) {
       const reportData = await reportResponse.json();
-      detailedReport = reportData?.choices?.[0]?.delta?.content || detailedReport;
+      detailedReport =
+        reportData?.choices?.[0]?.message?.content ||
+        reportData?.choices?.[0]?.delta?.content ||
+        detailedReport;
     }
 
     // 8. 更新评估记录
