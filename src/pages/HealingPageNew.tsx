@@ -98,8 +98,9 @@ const rawMusicFiles: Array<{
   },
 ];
 
-// 音乐资源统一使用相对路径，Vite 构建时 public/ 目录下的文件会原样复制到 dist/
-const MUSIC_BASE_URL = '/srcs/music';
+// public/ 资源需要跟随 Vite base，否则部署在 /xinyucare/ 子路径时会请求到域名根目录。
+const PUBLIC_BASE_URL = import.meta.env.BASE_URL || '/';
+const MUSIC_BASE_URL = `${PUBLIC_BASE_URL.replace(/\/?$/, '/')}srcs/music`;
 
 const meditationTracks = rawMusicFiles
   .map(({ fileName, category, description, coverImage }) => {
