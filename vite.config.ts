@@ -21,6 +21,9 @@ export default defineConfig(({ mode }) => {
   return {
     base,
     publicDir: 'public',
+    server: {
+      allowedHosts: ['jp.jerrypsy.top'],
+    },
     plugins: [
       {
         name: 'code-server-proxy-base-compat',

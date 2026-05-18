@@ -6,9 +6,20 @@ export interface SiliconFlowTranscriptionResponse {
   // x-siliconcloud-trace-id header is available in response
 }
 
+function audioFileNameFromMime(type?: string) {
+  const mime = (type || '').toLowerCase();
+  if (mime.includes('webm')) return 'audio.webm';
+  if (mime.includes('ogg')) return 'audio.ogg';
+  if (mime.includes('mpeg') || mime.includes('mp3')) return 'audio.mp3';
+  if (mime.includes('mp4') || mime.includes('m4a')) return 'audio.m4a';
+  return 'audio.wav';
+}
+
 export async function transcribeAudio(audioFile: File | Blob, model: 'TeleAI/TeleSpeechASR' | 'FunAudioLLM/SenseVoiceSmall' = 'TeleAI/TeleSpeechASR'): Promise<SiliconFlowTranscriptionResponse> {
   const formData = new FormData();
-  const file = (audioFile instanceof File) ? audioFile : new File([audioFile], 'audio.wav', { type: (audioFile as any)?.type || 'audio/wav' });
+  const file = (audioFile instanceof File)
+    ? audioFile
+    : new File([audioFile], audioFileNameFromMime((audioFile as any)?.type), { type: (audioFile as any)?.type || 'audio/wav' });
   formData.append('file', file, file.name);
   formData.append('model', model);
 

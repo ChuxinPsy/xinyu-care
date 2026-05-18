@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { transcribeAudio } from '@/db/siliconflow';
+import { convertWebmToWav } from '@/utils/audio';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface VoiceStepProps {
@@ -167,12 +168,18 @@ export default function VoiceStep({ onComplete }: VoiceStepProps) {
     }, 200);
     
     try {
+      const shouldConvertToWav = /webm|ogg|opus/i.test(blob.type || '');
+      let analysisBlob = blob;
+      if (shouldConvertToWav) {
+        analysisBlob = await convertWebmToWav(blob);
+      }
+
       // 1. ASR Transcription
-      const transcription = await transcribeAudio(blob);
-      const text = transcription.text;
+      const transcription = await transcribeAudio(analysisBlob);
+      const text = (transcription.text || '').trim();
       
       // 2. Prosody analysis (client-side) as SER approximation
-      const arrayBuffer = await blob.arrayBuffer();
+      const arrayBuffer = await analysisBlob.arrayBuffer();
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const buffer = await audioCtx.decodeAudioData(arrayBuffer);
       const sampleRate = buffer.sampleRate;
@@ -190,7 +197,8 @@ export default function VoiceStep({ onComplete }: VoiceStepProps) {
           rms += v * v;
           if (j > i) zc += (channelData[j - 1] > 0) !== (v > 0) ? 1 : 0;
         }
-        rms = Math.sqrt(rms / (end - i));
+        const sampleCount = Math.max(1, end - i);
+        rms = Math.sqrt(rms / sampleCount);
         const isPause = rms < 0.02; // threshold
         if (isPause) pauses++;
         rmsSum += rms;
@@ -199,10 +207,11 @@ export default function VoiceStep({ onComplete }: VoiceStepProps) {
         frames++;
       }
       
-      const avgRms = rmsSum / frames;
-      const varRms = Math.max(0, rmsSqSum / frames - avgRms * avgRms);
-      const durationSec = buffer.duration;
-      const pauseRatio = pauses / frames;
+      const safeFrames = Math.max(1, frames);
+      const avgRms = rmsSum / safeFrames;
+      const varRms = Math.max(0, rmsSqSum / safeFrames - avgRms * avgRms);
+      const durationSec = Math.max(0.1, buffer.duration);
+      const pauseRatio = pauses / safeFrames;
       const speechRateApprox = (text.length / (durationSec / 60)) || 0; // characters per minute
       const pauseDurationPerPause = pauses > 0 ? (pauses * 0.02) / (frames * 0.05) : 0; // approximation
       

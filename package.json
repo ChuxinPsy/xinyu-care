@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "dev:proxy": "VITE_BASE_PATH=/proxy/5173/ vite --host 0.0.0.0",
+    "dev:https": "VITE_BASE_PATH=/xinyucare/ vite --host 0.0.0.0",
     "build": "vite build",
     "lint": "npx tsc -p tsconfig.check.json --noEmit && npx biome lint && node .rules/check.cjs && node .rules/tailwind-check.cjs && node .rules/testBuild.cjs",
     "migrate:supabase": "node --loader @typescript/native-preview scripts/migrate-supabase.ts",
