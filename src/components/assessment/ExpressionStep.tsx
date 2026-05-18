@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
-import { modelScopeVisionChat } from '@/db/modelscope';
+import { openRouterVisionChat } from '@/db/openrouter';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface ExpressionStepProps {
@@ -308,9 +308,8 @@ export default function ExpressionStep({ onComplete }: ExpressionStepProps) {
 
       // 10秒超时控制 - 使用轻量级模型以加快响应
       const aiRes = await withTimeout(
-        modelScopeVisionChat(
+        openRouterVisionChat(
           {
-            model: 'Qwen/Qwen2-VL-7B-Instruct', // 使用更快的轻量级视觉模型
             text: prompt,
             image_url: dataUrl
           },
@@ -437,7 +436,7 @@ export default function ExpressionStep({ onComplete }: ExpressionStepProps) {
       
       if (isTimeout) {
         toast.warning('AI分析成功，正在输出报告');
-      } else if (errorMsg.includes('MODELSCOPE_API_KEY')) {
+      } else if (errorMsg.includes('OPENROUTER_API_KEY')) {
         toast.error('AI分析成功，正在输出报告');
       } else {
         toast.error('AI分析成功，正在输出报告');

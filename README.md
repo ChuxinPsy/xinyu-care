@@ -195,13 +195,10 @@
 │   │   └── 📄 mockSmartBandData.ts # 手环模拟数据（新增）
 │   └── 📁 services/               # 业务服务
 │       └── 📄 .keep               # 占位文件
-├── 📁 api/                        # API代理服务
-│   ├── 📁 volc/                   # 火山引擎API代理
-│   │   └── 📄 responses.ts        # 豆包大模型代理
-│   ├── 📁 siliconflow/            # 硅基流动API代理
-│   │   └── 📁 audio/              # 语音识别代理
-│   └── 📁 modelscope/             # 魔搭API代理
-│       └── 📁 chat/               # 聊天补全代理
+├── 📁 api/                        # OpenRouter API代理服务
+│   ├── 📁 openrouter/             # OpenRouter 代理
+│   │   ├── 📁 audio/              # audio transcription
+│   │   └── 📁 chat/               # chat/vision completions
 ├── 📁 scripts/                    # 工具脚本
 │   ├── 📄 migrate-supabase.ts     # 数据库迁移
 │   ├── 📄 seed-treehole.js        # 树洞数据填充
@@ -480,17 +477,13 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 # ===========================================
 # AI服务配置 (必须，用于AI功能)
 # ===========================================
-# 火山引擎豆包大模型
-VOLC_ARK_API_KEY=your-volc-ark-key
-VITE_VOLC_ARK_API_KEY=your-volc-ark-key
-
-# 硅基流动语音识别
-SILICONFLOW_API_KEY=your-siliconflow-key
-VITE_SILICONFLOW_API_KEY=your-siliconflow-key
-
-# 魔搭多模态大模型
-MODELSCOPE_API_KEY=your-modelscope-key
-VITE_MODELSCOPE_API_KEY=your-modelscope-key
+# OpenRouter 统一模型入口
+OPENROUTER_API_KEY=your-openrouter-key
+OPENROUTER_TEXT_MODEL=deepseek/deepseek-chat-v3-0324
+OPENROUTER_VISION_MODEL=qwen/qwen2.5-vl-72b-instruct
+OPENROUTER_TRANSCRIPTION_MODEL=mistralai/voxtral-small-24b-2507
+OPENROUTER_SITE_URL=http://localhost:5173
+OPENROUTER_APP_NAME=XinyuCare
 
 # ===========================================
 # 数据库迁移配置 (可选)
@@ -571,9 +564,8 @@ pnpm run promote:user
   "installCommand": "pnpm install --no-frozen-lockfile",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/innerapi/v1/volc/responses", "destination": "/api/volc/responses" },
-    { "source": "/innerapi/v1/siliconflow/audio/transcriptions", "destination": "/api/siliconflow/audio/transcriptions" },
-    { "source": "/innerapi/v1/modelscope/chat/completions", "destination": "/api/modelscope/chat/completions" }
+    { "source": "/innerapi/v1/openrouter/audio/transcriptions", "destination": "/api/openrouter/audio/transcriptions" },
+    { "source": "/innerapi/v1/openrouter/chat/completions", "destination": "/api/openrouter/chat/completions" }
   ]
 }
 ```
@@ -674,9 +666,10 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # AI服务 (必须配置)
-VOLC_ARK_API_KEY=your-volc-ark-key
-SILICONFLOW_API_KEY=your-siliconflow-key
-MODELSCOPE_API_KEY=your-modelscope-key
+OPENROUTER_API_KEY=your-openrouter-key
+OPENROUTER_TEXT_MODEL=deepseek/deepseek-chat-v3-0324
+OPENROUTER_VISION_MODEL=qwen/qwen2.5-vl-72b-instruct
+OPENROUTER_TRANSCRIPTION_MODEL=mistralai/voxtral-small-24b-2507
 
 # 应用配置
 VITE_APP_ID=app-97zabxvzebcx
@@ -774,4 +767,3 @@ Response: {
 
 
 ---
-

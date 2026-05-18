@@ -9,9 +9,8 @@ export default async function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   if (req.method === 'OPTIONS') { res.status(204).end(); return; }
-  const openRouterKey = process.env.OPENROUTER_API_KEY || '';
-  const key = openRouterKey || process.env.MODELSCOPE_API_KEY || process.env.VITE_MODELSCOPE_API_KEY || '';
-  if (!key) { res.status(500).setHeader('Content-Type','application/json'); res.end(JSON.stringify({ error: 'OPENROUTER_API_KEY 或 MODELSCOPE_API_KEY 未配置' })); return; }
+  const key = process.env.OPENROUTER_API_KEY || '';
+  if (!key) { res.status(500).setHeader('Content-Type','application/json'); res.end(JSON.stringify({ error: 'OPENROUTER_API_KEY 未配置' })); return; }
   try {
     const chunks: Buffer[] = [];
     await new Promise<void>((resolve, reject) => {
@@ -28,34 +27,22 @@ export default async function handler(req: any, res: any) {
       ...safeRequestBody
     } = requestBody;
     const maxTokens = clampOpenRouterMaxTokens(requestedMaxTokens, hasImage ? 256 : 512);
-    const upstreamBody = openRouterKey
-      ? JSON.stringify({
-          ...safeRequestBody,
-          model: hasImage
-            ? (process.env.OPENROUTER_VISION_MODEL || 'qwen/qwen2.5-vl-72b-instruct')
-            : (process.env.OPENROUTER_TEXT_MODEL || 'deepseek/deepseek-chat-v3-0324'),
-          max_tokens: maxTokens,
-        })
-      : rawBody;
-    const upstream = await fetch(
-      openRouterKey
-        ? 'https://openrouter.ai/api/v1/chat/completions'
-        : 'https://api-inference.modelscope.cn/v1/chat/completions',
-      {
+    const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${key.trim()}`,
         'Content-Type': req.headers['content-type'] || 'application/json',
-        ...(openRouterKey
-          ? {
-              'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'http://localhost:5173',
-              'X-Title': process.env.OPENROUTER_APP_NAME || 'XinyuCare',
-            }
-          : {})
+        'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'http://localhost:5173',
+        'X-Title': process.env.OPENROUTER_APP_NAME || 'XinyuCare',
       },
-      body: upstreamBody
-      }
-    );
+      body: JSON.stringify({
+        ...safeRequestBody,
+        model: hasImage
+          ? (process.env.OPENROUTER_VISION_MODEL || 'qwen/qwen2.5-vl-72b-instruct')
+          : (process.env.OPENROUTER_TEXT_MODEL || 'deepseek/deepseek-chat-v3-0324'),
+        max_tokens: maxTokens,
+      })
+    });
     const text = await upstream.text();
     res.status(upstream.status).setHeader('Content-Type', 'application/json');
     res.end(text);

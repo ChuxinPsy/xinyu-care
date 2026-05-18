@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { createEmotionDiary, getEmotionDiaries, updateEmotionDiary } from '@/db/api';
-import { transcribeAudio } from '@/db/siliconflow';
+import { transcribeAudio } from '@/db/openrouter';
 import type { EmotionDiary, EmotionLevel } from '@/types';
 import { blobToBase64 } from '@/utils/audio';
 

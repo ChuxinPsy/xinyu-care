@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
-import { transcribeAudio } from '@/db/siliconflow';
+import { transcribeAudio } from '@/db/openrouter';
 import { convertWebmToWav } from '@/utils/audio';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -264,27 +264,27 @@ export default function VoiceStep({ onComplete }: VoiceStepProps) {
       const analysisTemplates = [
         // 模板1：标准中性/平静状态
         (metrics: any, domEmotion: any, secEmotion: any) => 
-          `SenseVoice模型检测分析：整体语速${metrics.speed}字/分、语调基频${metrics.tone}Hz、能量值${metrics.energy}dB均在正常参考范围内。情绪雷达显示以${domEmotion.label}为主导（占比${(domEmotion.value * 100).toFixed(1)}%），伴随${secEmotion.label}情绪（占比${(secEmotion.value * 100).toFixed(1)}%），声学特征稳定，情绪波动平稳，心理状态良好。`,
+          `OpenRouter语音模型检测分析：整体语速${metrics.speed}字/分、语调基频${metrics.tone}Hz、能量值${metrics.energy}dB均在正常参考范围内。情绪雷达显示以${domEmotion.label}为主导（占比${(domEmotion.value * 100).toFixed(1)}%），伴随${secEmotion.label}情绪（占比${(secEmotion.value * 100).toFixed(1)}%），声学特征稳定，情绪波动平稳，心理状态良好。`,
         
         // 模板2：高兴/积极情绪
         (metrics: any, domEmotion: any, secEmotion: any) => 
-          `SenseVoice模型检测分析：语速适中（${metrics.speed}字/分），语调上扬特征明显（基频${metrics.tone}Hz），能量充沛（${metrics.energy}dB）。情绪识别结果显示${domEmotion.label}情绪显著（${(domEmotion.value * 100).toFixed(1)}%），声学波形呈现积极振动模式，建议保持当前愉悦的心理状态。`,
+          `OpenRouter语音模型检测分析：语速适中（${metrics.speed}字/分），语调上扬特征明显（基频${metrics.tone}Hz），能量充沛（${metrics.energy}dB）。情绪识别结果显示${domEmotion.label}情绪显著（${(domEmotion.value * 100).toFixed(1)}%），声学波形呈现积极振动模式，建议保持当前愉悦的心理状态。`,
         
         // 模板3：惊讶/波动情绪
         (metrics: any, domEmotion: any, secEmotion: any) => 
-          `SenseVoice模型检测分析：检测到语调波动较大（基频${metrics.tone}Hz），能量分布呈现突发峰值（${metrics.energy}dB）。情绪雷达显示${domEmotion.label}情绪占主导（${(domEmotion.value * 100).toFixed(1)}%），伴随明显的情绪起伏特征，建议适当平复心情，保持情绪稳定。`,
+          `OpenRouter语音模型检测分析：检测到语调波动较大（基频${metrics.tone}Hz），能量分布呈现突发峰值（${metrics.energy}dB）。情绪雷达显示${domEmotion.label}情绪占主导（${(domEmotion.value * 100).toFixed(1)}%），伴随明显的情绪起伏特征，建议适当平复心情，保持情绪稳定。`,
         
         // 模板4：愤怒/激动情绪
         (metrics: any, domEmotion: any, secEmotion: any) => 
-          `SenseVoice模型检测分析：语速偏快（${metrics.speed}字/分），语调基频升高（${metrics.tone}Hz），能量值处于较高水平（${metrics.energy}dB）。情绪识别检测到${domEmotion.label}情绪（${(domEmotion.value * 100).toFixed(1)}%），声学特征显示一定的激动状态，建议进行深呼吸放松，调节情绪平衡。`,
+          `OpenRouter语音模型检测分析：语速偏快（${metrics.speed}字/分），语调基频升高（${metrics.tone}Hz），能量值处于较高水平（${metrics.energy}dB）。情绪识别检测到${domEmotion.label}情绪（${(domEmotion.value * 100).toFixed(1)}%），声学特征显示一定的激动状态，建议进行深呼吸放松，调节情绪平衡。`,
         
         // 模板5：悲伤/低落情绪（需要关注）
         (metrics: any, domEmotion: any, secEmotion: any) => 
-          `SenseVoice模型检测分析：语速${isLowSpeed ? '缓慢' : '正常'}（${metrics.speed}字/分），语调基频${isHighPitchDrop ? '下降明显' : '偏低'}（${metrics.tone}Hz），能量值${metrics.energy}dB。情绪雷达显示${domEmotion.label}情绪占比较高（${(domEmotion.value * 100).toFixed(1)}%），${isLongPause ? '伴有较长停顿，' : ''}建议关注心理健康状态，必要时寻求专业心理咨询。`,
+          `OpenRouter语音模型检测分析：语速${isLowSpeed ? '缓慢' : '正常'}（${metrics.speed}字/分），语调基频${isHighPitchDrop ? '下降明显' : '偏低'}（${metrics.tone}Hz），能量值${metrics.energy}dB。情绪雷达显示${domEmotion.label}情绪占比较高（${(domEmotion.value * 100).toFixed(1)}%），${isLongPause ? '伴有较长停顿，' : ''}建议关注心理健康状态，必要时寻求专业心理咨询。`,
         
         // 模板6：复杂混合情绪
         (metrics: any, domEmotion: any, secEmotion: any) => 
-          `SenseVoice模型深度分析：语速${metrics.speed}字/分，语调基频${metrics.tone}Hz，能量${metrics.energy}dB。情绪向量显示${domEmotion.label}（${(domEmotion.value * 100).toFixed(1)}%）与${secEmotion.label}（${(secEmotion.value * 100).toFixed(1)}%）形成复合情绪模式，声学特征呈现多维度波动，建议结合量表评估进行综合判断。`,
+          `OpenRouter语音模型深度分析：语速${metrics.speed}字/分，语调基频${metrics.tone}Hz，能量${metrics.energy}dB。情绪向量显示${domEmotion.label}（${(domEmotion.value * 100).toFixed(1)}%）与${secEmotion.label}（${(secEmotion.value * 100).toFixed(1)}%）形成复合情绪模式，声学特征呈现多维度波动，建议结合量表评估进行综合判断。`,
       ];
 
       // 根据主导情绪选择合适的模板索引

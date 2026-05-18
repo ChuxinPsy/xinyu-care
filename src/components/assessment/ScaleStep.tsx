@@ -12,7 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
 import { getKnowledgeBase } from '@/db/api';
-import { modelScopeChatCompletion, formatAIResponse } from '@/db/modelscope';
+import { openRouterChatCompletion, formatAIResponse } from '@/db/openrouter';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -606,7 +606,7 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
 3. 禁止使用"好的/我理解了/我知道了/我能感受到"等空泛词
 4. 若用户提到具体时间/频率，必须在回复中体现${kbSnippet ? `\n\n参考：${kbSnippet}` : ''}`;
 
-      const aiResponse = await modelScopeChatCompletion({
+      const aiResponse = await openRouterChatCompletion({
         messages: [
           { role: 'system', content: systemPrompt },
           ...conversationHistory,
@@ -750,10 +750,10 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
         if (e.data?.size > 0 && !asrBusyRef.current) {
           asrBusyRef.current = true;
           try {
-            const { transcribeAudio } = await import('@/db/siliconflow');
+            const { transcribeAudio } = await import('@/db/openrouter');
             const { convertWebmToWav } = await import('@/utils/audio');
             const wavBlob = await convertWebmToWav(e.data);
-            const res = await transcribeAudio(wavBlob, 'TeleAI/TeleSpeechASR');
+            const res = await transcribeAudio(wavBlob);
             const text = res?.text || '';
             if (text) setInputText(prev => `${prev}${text}`.trimStart());
             asrErrorCountRef.current = 0;
@@ -962,7 +962,7 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
 3. 禁止使用"好的/我理解了/我知道了/我能感受到"等空泛词
 4. 若用户提到具体时间/频率，必须在回复中体现${kbSnippet ? `\n\n参考：${kbSnippet}` : ''}`;
 
-      const aiResponse = await modelScopeChatCompletion({
+      const aiResponse = await openRouterChatCompletion({
         messages: [
           { role: 'system', content: systemPrompt },
           ...conversationHistory,

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/db/supabase';
-import { transcribeAudio } from '@/db/siliconflow';
+import { transcribeAudio } from '@/db/openrouter';
 import { convertWebmToWav } from '@/utils/audio';
 
 interface QuickNoteProps {
@@ -77,7 +77,7 @@ export default function QuickNote({ onSave, initialContent = '', initialImages =
           asrBusy = true;
           try {
             const wavBlob = await convertWebmToWav(event.data);
-            const res = await transcribeAudio(wavBlob, 'TeleAI/TeleSpeechASR');
+            const res = await transcribeAudio(wavBlob);
             if (res?.text) setContent(prev => (prev ? `${prev} ` : '') + res.text.trim());
           } catch (e) {}
           asrBusy = false;

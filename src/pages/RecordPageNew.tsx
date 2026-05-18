@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { createEmotionDiary, getEmotionDiaries, updateEmotionDiary } from '@/db/api';
 import type { EmotionDiary, EmotionLevel } from '@/types';
 import { blobToBase64, convertWebmToWav } from '@/utils/audio';
-import { transcribeAudio } from '@/db/siliconflow';
+import { transcribeAudio } from '@/db/openrouter';
 
 const EMOTIONS = [
   {
@@ -204,7 +204,7 @@ export default function RecordPageNew() {
           asrBusy = true;
           try {
             const wavBlob = await convertWebmToWav(event.data);
-            const res = await transcribeAudio(wavBlob, 'TeleAI/TeleSpeechASR');
+            const res = await transcribeAudio(wavBlob);
             const text = res?.text?.trim();
             if (text) setContent(prev => prev + (prev ? '\n' : '') + text);
           } catch {
