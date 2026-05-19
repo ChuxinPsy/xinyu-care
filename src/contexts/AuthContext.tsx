@@ -97,18 +97,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(usernameValidation.message || '用户名格式不正确');
       }
 
-      // 如果是医生注册，需要验证校证码
+      // 如果是医生注册，需要验证验证码
       if (desiredRole === 'doctor') {
         if (!verificationCode) {
-          throw new Error('医生注册需要校证码');
+          throw new Error('医生注册需要验证码');
         }
         
-        // 验证校证码
+        // 验证验证码
         const { verifyCode } = await import('@/db/api');
         const verifyResult = await verifyCode(verificationCode);
         
         if (!verifyResult.valid) {
-          throw new Error(verifyResult.message || '校证码无效');
+          throw new Error(verifyResult.message || '验证码无效');
         }
       }
       

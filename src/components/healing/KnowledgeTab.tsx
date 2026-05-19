@@ -17,6 +17,7 @@ import {
   toggleFavorite,
 } from '@/db/api';
 import type { HealingContent } from '@/types';
+import { publicAssetUrl } from '@/utils/public-assets';
 
 const CONTENT_TYPES = [
   { id: 'all', label: '全部', icon: BookOpen, gradient: 'from-violet-500 to-fuchsia-500' },
@@ -33,6 +34,27 @@ const TYPE_COLORS: Record<string, string> = {
   article: 'from-sky-500 to-cyan-500',
   video: 'from-rose-500 to-pink-500',
 };
+
+const LOCAL_VIDEO_BY_TITLE: Record<string, string> = {
+  '正念冥想入门指南': '/srcs/video/正念冥想.mp4',
+  '正念冥想': '/srcs/video/正念冥想.mp4',
+  '睡眠与心理健康': '/srcs/video/睡眠与心理健康.mp4',
+  '睡眠与心理健康的关系': '/srcs/video/睡眠与心理健康.mp4',
+  '运动与心理健康': '/srcs/video/运动与心理健康.mp4',
+  '运动如何改善心理健康': '/srcs/video/运动与心理健康.mp4',
+};
+
+function normalizeKnowledgeContent(content: HealingContent): HealingContent {
+  const fallbackVideoUrl = content.content_type === 'video'
+    ? Object.entries(LOCAL_VIDEO_BY_TITLE).find(([title]) => content.title.includes(title))?.[1]
+    : undefined;
+
+  return {
+    ...content,
+    content_url: publicAssetUrl(content.content_url || fallbackVideoUrl),
+    thumbnail_url: publicAssetUrl(content.thumbnail_url),
+  };
+}
 
 // 视频缩略图组件 - 自动提取视频第一帧作为封面
 interface VideoThumbnailCardProps {
@@ -191,9 +213,9 @@ export default function KnowledgeTab() {
       ]);
       
       // 过滤出知识库内容（仅文章和视频，排除音频）
-      const knowledgeContents = contentsData.filter(c =>
-        c.content_type === 'article' || c.content_type === 'video'
-      );
+      const knowledgeContents = contentsData
+        .filter(c => c.content_type === 'article' || c.content_type === 'video')
+        .map(normalizeKnowledgeContent);
       
       setContents(knowledgeContents);
       setFavorites(new Set(favoritesData.map((f: any) => f.content_id)));

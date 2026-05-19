@@ -34,6 +34,7 @@ import {
   togglePostLike,
 } from '@/db/api';
 import type { CommunityPost, HealingContent } from '@/types';
+import { publicAssetUrl } from '@/utils/public-assets';
 
 interface ContentDetailDialogProps {
   open: boolean;
@@ -50,6 +51,48 @@ interface Comment {
   content: string;
   like_count: number;
   created_at: string;
+}
+
+const ARTICLE_BODY_BY_TITLE: Record<string, string> = {
+  '认识抑郁症:症状与诊断': `抑郁症是一种常见但可治疗的心理疾病。它并不是简单的“心情不好”，而是持续影响情绪、兴趣、精力、睡眠、食欲和自我评价的一组症状。
+
+常见表现包括持续情绪低落、对原本喜欢的事情失去兴趣、容易疲惫、睡眠变差或睡眠过多、注意力下降、食欲和体重变化，以及明显的自责或无价值感。如果这些表现持续两周以上，并影响学习、工作或人际关系，就需要认真对待。
+
+诊断通常需要结合标准化量表、临床访谈和生活功能评估。PHQ-9、HAMD 等量表可以帮助初步筛查，但不能替代专业诊断。
+
+治疗方式包括心理治疗、药物治疗、运动和睡眠干预、社会支持等。大多数患者在规范治疗和持续支持下可以明显改善。`,
+  '如何应对焦虑情绪': `焦虑是人在面对压力和不确定性时的自然反应。适度焦虑可以帮助我们保持警觉，但当焦虑过强、持续太久，或影响睡眠、工作和生活时，就需要主动调节。
+
+可以先从身体层面入手：进行缓慢腹式呼吸，吸气 4 秒、停顿 2 秒、呼气 6 秒，重复 3 到 5 分钟。也可以尝试渐进式肌肉放松，从脚趾到肩颈逐步收紧再放松肌肉。
+
+认知层面可以记录让你焦虑的念头，区分“事实”和“推测”。把“我肯定做不好”改写为“我担心做不好，但可以先完成最小一步”，能降低灾难化思维带来的压力。
+
+如果焦虑伴随明显惊恐发作、持续失眠或回避行为，建议寻求专业心理咨询或精神科评估。`,
+  '认知行为疗法(CBT)介绍': `认知行为疗法（CBT）是一种结构化、目标明确的心理治疗方法。它的核心观点是：影响我们情绪的，往往不是事件本身，而是我们对事件的解释和看法。
+
+CBT 通常会关注三个层次的认知：自动思维、中间信念和核心信念。自动思维是具体情境下快速出现的念头，例如“我又失败了”。中间信念包括规则和假设，例如“我必须表现完美”。核心信念则更深层，例如“我不够好”。
+
+治疗过程中，咨询师会帮助来访者识别这些想法，检验证据，寻找更平衡的解释，并通过行为实验、行为激活、问题解决训练等方式改变旧有模式。
+
+CBT 通常持续 8 到 20 次，适用于抑郁、焦虑、强迫、睡眠问题和压力管理等场景。`,
+  '家人如何支持抑郁症患者': `支持抑郁症患者，首先要理解这不是“想不开”或“不努力”，而是一种真实的身心疾病。患者可能出现低落、迟缓、疲惫、回避社交和自责，这些表现需要被看见，而不是被责备。
+
+陪伴时尽量避免说“想开点”“你就是太脆弱了”。更有效的表达是：“我看到你很难受，我愿意陪你一起面对。”倾听时不急着给建议，先确认对方的感受。
+
+在生活中，可以帮助患者维持基本作息，例如一起散步、准备简单饮食、提醒就医或按医嘱服药。目标不要过高，能完成一点点就是进展。
+
+如果患者表达自伤、自杀想法，或出现明显危险行为，需要立即联系家属、医生或当地紧急救助资源。`,
+};
+
+function resolveContentUrl(content: HealingContent) {
+  return publicAssetUrl(content.content_url);
+}
+
+function resolveArticleText(content: HealingContent | CommunityPost, fallback: string) {
+  if ('content_type' in content && content.content_type === 'article') {
+    return ARTICLE_BODY_BY_TITLE[content.title] || content.description || fallback;
+  }
+  return fallback;
 }
 
 export default function ContentDetailDialog({
@@ -76,8 +119,7 @@ export default function ContentDetailDialog({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [showVideoControls, setShowVideoControls] = useState(true);
-  const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [videoError, setVideoError] = useState('');
 
   useEffect(() => {
     if (open && content) {
@@ -232,18 +274,6 @@ export default function ContentDetailDialog({
     return gradients[index % gradients.length];
   };
 
-  // 视频播放控制函数
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       setCurrentTime(videoRef.current.currentTime);
@@ -253,14 +283,7 @@ export default function ContentDetailDialog({
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
-    }
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseFloat(e.target.value);
-    if (videoRef.current) {
-      videoRef.current.currentTime = time;
-      setCurrentTime(time);
+      setVideoError('');
     }
   };
 
@@ -268,39 +291,17 @@ export default function ContentDetailDialog({
     setIsPlaying(false);
   };
 
-  const handleVideoClick = () => {
-    togglePlay();
-    // 显示控制栏
-    setShowVideoControls(true);
-    // 清除之前的定时器
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-    // 3秒后隐藏控制栏
-    controlsTimeoutRef.current = setTimeout(() => {
-      if (isPlaying) {
-        setShowVideoControls(false);
-      }
-    }, 3000);
-  };
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
-
   // 判断内容类型
   const isKnowledgeContent = type === 'knowledge' && content && 'content_type' in content;
   const contentType = isKnowledgeContent ? (content as HealingContent).content_type : null;
-  const contentUrl = isKnowledgeContent ? (content as HealingContent).content_url : null;
+  const contentUrl = isKnowledgeContent ? resolveContentUrl(content as HealingContent) : null;
 
   if (!content) return null;
 
   const title = 'title' in content ? content.title : '';
-  const description = 'description' in content ? content.description : '';
+  const description = ('description' in content ? content.description : '') || '';
   const author = 'author' in content ? content.author : '';
-  const contentText = 'content' in content ? (content as CommunityPost).content : description;
+  const contentText = resolveArticleText(content, 'content' in content ? (content as CommunityPost).content : description);
   const createdAt = content.created_at;
 
   return (
@@ -348,75 +349,33 @@ export default function ContentDetailDialog({
             <div className="space-y-4">
               {/* 视频播放器 */}
               {contentType === 'video' && contentUrl && (
-                <div className="relative w-full rounded-xl overflow-hidden bg-black aspect-video group/video">
+                <div className="relative w-full rounded-xl overflow-hidden bg-black aspect-video">
                   <video
                     ref={videoRef}
                     src={contentUrl}
-                    className="w-full h-full object-contain cursor-pointer"
-                    onClick={handleVideoClick}
+                    className="w-full h-full object-contain"
+                    controls
+                    preload="metadata"
+                    onPlay={() => {
+                      setIsPlaying(true);
+                      setVideoError('');
+                    }}
+                    onPause={() => setIsPlaying(false)}
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onEnded={handleVideoEnded}
+                    onError={() => {
+                      setIsPlaying(false);
+                      setVideoError('视频加载失败，请检查网络或稍后重试');
+                    }}
                     playsInline
                   />
 
-                  {/* 播放按钮覆盖层 */}
-                  {!isPlaying && (
-                    <div
-                      className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer"
-                      onClick={handleVideoClick}
-                    >
-                      <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-                        <Play className="w-8 h-8 text-primary ml-1" fill="currentColor" />
-                      </div>
+                  {videoError && (
+                    <div className="absolute inset-x-4 top-4 rounded-lg bg-red-500/90 px-3 py-2 text-sm text-white">
+                      {videoError}
                     </div>
                   )}
-
-                  {/* 视频控制栏 */}
-                  <div
-                    className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-8 transition-opacity duration-300 ${
-                      showVideoControls || !isPlaying ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  >
-                    {/* 进度条 */}
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-white text-xs font-mono">{formatTime(currentTime)}</span>
-                      <input
-                        type="range"
-                        min={0}
-                        max={duration || 0}
-                        value={currentTime}
-                        onChange={handleSeek}
-                        className="flex-1 h-1 bg-white/30 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
-                      />
-                      <span className="text-white text-xs font-mono">{formatTime(duration)}</span>
-                    </div>
-
-                    {/* 播放控制按钮 */}
-                    <div className="flex items-center justify-between">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={togglePlay}
-                        className="text-white hover:bg-white/20 h-8 px-2"
-                      >
-                        {isPlaying ? (
-                          <div className="flex gap-0.5">
-                            <div className="w-1 h-4 bg-white rounded-sm" />
-                            <div className="w-1 h-4 bg-white rounded-sm" />
-                          </div>
-                        ) : (
-                          <Play className="w-5 h-5" fill="currentColor" />
-                        )}
-                      </Button>
-
-                      {/* 类型标签 */}
-                      <Badge className="bg-rose-500/80 text-white border-0">
-                        <Video className="w-3 h-3 mr-1" />
-                        视频
-                      </Badge>
-                    </div>
-                  </div>
                 </div>
               )}
 

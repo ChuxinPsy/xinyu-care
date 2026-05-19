@@ -99,10 +99,10 @@ export default function LoginPage() {
       return;
     }
     
-    // 医生端注册需要校证码
+    // 医生端注册需要验证码
     if (role === 'doctor') {
       if (!verificationCode) {
-        toast.error('医生端注册需要校证码');
+        toast.error('医生端注册需要验证码');
         return;
       }
     }
@@ -214,16 +214,16 @@ export default function LoginPage() {
                 </div>
                 {role === 'doctor' && (
                   <div className="space-y-2">
-                    <Label htmlFor="verification-code">校证码</Label>
+                    <Label htmlFor="verification-code">验证码</Label>
                     <Input
                       id="verification-code"
                       type="text"
-                      placeholder="请输入医生端校证码"
+                      placeholder="请输入医生端验证码"
                       value={verificationCode}
                       onChange={(e) => setVerificationCode(e.target.value)}
                       disabled={loading}
                     />
-                    <p className="text-xs text-muted-foreground">医生端注册需要校证码，请联系管理员获取</p>
+                    <p className="text-xs text-muted-foreground">医生端注册需要验证码，请联系管理员获取</p>
                   </div>
                 )}
                 <Button type="submit" className="w-full" disabled={loading}>
