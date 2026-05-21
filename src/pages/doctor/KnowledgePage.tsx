@@ -277,6 +277,18 @@ export default function KnowledgePage() {
         });
         knowledgeData.tags = tagsArray;
       } 
+      // 编辑已有文档但没有重新上传文件时，保留原文档元数据。
+      else if (editingItem?.content_type === 'document' && editingItem.file_url && !uploadingFile) {
+        knowledgeData = {
+          ...knowledgeData,
+          content_type: 'document',
+          file_url: editingItem.file_url,
+          file_name: editingItem.file_name,
+          file_size: editingItem.file_size,
+          file_mime_type: editingItem.file_mime_type,
+          content: content.trim() || editingItem.content,
+        };
+      }
       // 纯文本处理
       else {
         if (!content.trim()) {

@@ -1,4 +1,6 @@
 // 图片加载工具函数
+import { publicAssetUrl } from './public-assets';
+
 export interface CarouselImage {
   src: string;
   alt: string;
@@ -12,9 +14,9 @@ export interface CarouselImage {
 export const loadCarouselImages = (): CarouselImage[] => {
   // 直接返回已知的图片路径
   return [
-    { src: '/srcs/img/1.png', alt: '轮播图片 1', name: '1' },
-    { src: '/srcs/img/2.png', alt: '轮播图片 2', name: '2' },
-    { src: '/srcs/img/3.png', alt: '轮播图片 3', name: '3' },
+    { src: publicAssetUrl('/srcs/img/1.png'), alt: '轮播图片 1', name: '1' },
+    { src: publicAssetUrl('/srcs/img/2.png'), alt: '轮播图片 2', name: '2' },
+    { src: publicAssetUrl('/srcs/img/3.png'), alt: '轮播图片 3', name: '3' },
   ];
 };
 

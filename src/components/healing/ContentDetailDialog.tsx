@@ -136,11 +136,14 @@ export default function ContentDetailDialog({
         await incrementViewCount(content.id);
       }
 
-      // 加载评论（仅树洞和知识库）
-      if (type === 'community' || type === 'knowledge') {
+      // 知识内容来自 healing_contents，不能复用树洞评论表的 post_id 外键。
+      if (type === 'community') {
         const commentsData = await getCommunityComments(content.id);
         setComments(commentsData);
         setCommentCount(commentsData.length);
+      } else {
+        setComments([]);
+        setCommentCount(0);
       }
 
       // 初始化点赞和收藏状态
@@ -450,7 +453,7 @@ export default function ContentDetailDialog({
             </div>
 
             {/* 评论区域 */}
-            {(type === 'community' || type === 'knowledge') && (
+            {type === 'community' && (
               <div className="space-y-4">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <MessageCircle className="w-5 h-5 text-primary" />

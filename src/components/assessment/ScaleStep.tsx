@@ -142,6 +142,30 @@ function getQuestionAt(
   return ensureQuestionMark('请描述一下您最近两周的心情与兴趣变化');
 }
 
+function scoreAnswer(content: string): number {
+  const text = content.trim();
+  if (/(完全没有|没有|从不|并不|0\s*分)/.test(text)) return 0;
+  if (/(几天|偶尔|有一点|轻微|1\s*分)/.test(text)) return 1;
+  if (/(一半|经常|比较|明显|2\s*分)/.test(text)) return 2;
+  if (/(几乎每天|每天|总是|严重|非常|不想活|自杀|轻生|死亡|3\s*分)/.test(text)) return 3;
+  if (/(难受|崩溃|绝望|无助|低落|焦虑|睡不着|疲惫)/.test(text)) return 2;
+  return 1;
+}
+
+function getScaleRiskLevel(score: number): 'low' | 'medium' | 'high' {
+  if (score >= 20) return 'high';
+  if (score >= 10) return 'medium';
+  return 'low';
+}
+
+function serializeConversation(messages: Message[]) {
+  return messages.map(m => ({
+    role: m.role,
+    content: m.content,
+    timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : m.timestamp,
+  }));
+}
+
 // 常用表情列表
 const EMOJI_LIST = [
   '😊', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
@@ -988,8 +1012,10 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
       }
 
       const aiMsg: Message = { role: 'assistant', content: aiContent, timestamp: new Date(), avatar: DOCTOR_AVATAR };
+      let completedMessages: Message[] | null = null;
       setMessages(prev => {
         const newMessages = [...prev, aiMsg];
+        completedMessages = newMessages;
         // 触发打字机效果：新消息在末尾
         setTypingMsgIdx(newMessages.length - 1);
         setTypingText('');
@@ -1020,7 +1046,7 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
 
       // 如果完成所有题目
       if (currentQuestionIndex + 1 >= totalQuestions) {
-        handleComplete();
+        handleComplete(completedMessages ?? [...messages, userMsg, aiMsg]);
       }
 
     } catch (error) {
@@ -1031,15 +1057,39 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
     }
   };
 
-  const handleComplete = () => {
-    // 模拟评分
-    const mockScore = Math.floor(Math.random() * 27);
-    setScore(mockScore);
+  const buildScaleResult = (sourceMessages: Message[] = messages) => {
+    const userAnswers = sourceMessages.filter(m => m.role === 'user');
+    const answerScores = userAnswers.slice(0, totalQuestions).map(m => scoreAnswer(m.content));
+    const maxRawScore = Math.max(1, totalQuestions * 3);
+    const rawScore = answerScores.reduce((sum, item) => sum + item, 0);
+    const normalizedScore = Math.min(27, Math.round((rawScore / maxRawScore) * 27));
+    const level = getScaleRiskLevel(normalizedScore);
+    const labels = (questionBank.length > 0 ? questionBank : selectedScales.flatMap(id => BUILTIN_SCALE_QUESTIONS[id] ?? []))
+      .slice(0, 9)
+      .map(q => q.split(/[：:]/)[0] || q.slice(0, 6));
+
+    return {
+      score: normalizedScore,
+      phq9_score: normalizedScore,
+      raw_score: rawScore,
+      max_raw_score: maxRawScore,
+      riskLevel: level,
+      risk_level: level,
+      scaleTypes: selectedScales,
+      dimensionScores: labels.map((label, idx) => ({
+        label,
+        score: answerScores[idx] ?? 0,
+        max: 3,
+      })),
+      conversationHistory: serializeConversation(sourceMessages),
+    };
+  };
+
+  const handleComplete = (completionMessages: Message[] = messages) => {
+    const result = buildScaleResult(completionMessages);
+    setScore(result.score);
     
-    let level: 'low' | 'medium' | 'high' = 'low';
-    if (mockScore >= 20) level = 'high';
-    else if (mockScore >= 10) level = 'medium';
-    
+    const level = result.riskLevel;
     setRiskLevel(level);
     setShowReport(true);
 
@@ -1737,11 +1787,11 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
                   <Printer className="w-4 h-4 mr-2" /> PNG
                 </Button>
               </div>
-              <Button 
-                onClick={() => {
-                  setShowReport(false);
-                  onComplete({ score, riskLevel });
-                }}
+                <Button 
+                  onClick={() => {
+                    setShowReport(false);
+                    onComplete(buildScaleResult(messages));
+                  }}
                 disabled={nextButtonDisabled}
                 className="w-full h-14 rounded-2xl text-lg font-bold shadow-xl shadow-primary/20"
               >

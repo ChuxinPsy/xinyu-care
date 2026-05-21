@@ -17,6 +17,31 @@ import type {
 } from '@/types';
 import { supabase } from './supabase';
 
+const assessmentFingerprint = (assessment: any) => {
+  if (assessment.assessment_type !== 'fusion_report') return assessment.id;
+  const createdAt = assessment.created_at ? new Date(assessment.created_at).getTime() : 0;
+  const timeBucket = createdAt ? Math.floor(createdAt / (2 * 60 * 1000)) : assessment.id;
+  return [
+    assessment.user_id,
+    assessment.assessment_type,
+    assessment.score ?? '',
+    assessment.report?.scaleData?.score ?? '',
+    assessment.report?.voiceData?.score ?? '',
+    assessment.report?.expressionData?.depression_risk_score ?? '',
+    timeBucket,
+  ].join('|');
+};
+
+const dedupeAssessments = <T extends any[]>(assessments: T): T => {
+  const seen = new Set<string>();
+  return assessments.filter((assessment: any) => {
+    const key = assessmentFingerprint(assessment);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }) as T;
+};
+
 // ==================== 用户档案 ====================
 export const getProfile = async (userId: string) => {
   const { data, error } = await supabase
@@ -117,6 +142,28 @@ export const getAssessments = async (userId: string, limit = 10) => {
     .order('created_at', { ascending: false })
     .limit(limit);
   
+  if (error) throw error;
+  return Array.isArray(data) ? dedupeAssessments(data).slice(0, limit) : [];
+};
+
+export const getAllAssessments = async (limit = 1000) => {
+  const { data, error } = await supabase
+    .from('assessments')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return Array.isArray(data) ? dedupeAssessments(data).slice(0, limit) : [];
+};
+
+export const getAllEmotionDiaries = async (limit = 1000) => {
+  const { data, error } = await supabase
+    .from('emotion_diaries')
+    .select('*')
+    .order('diary_date', { ascending: false })
+    .limit(limit);
+
   if (error) throw error;
   return Array.isArray(data) ? data : [];
 };
@@ -419,16 +466,19 @@ export const syncReport = async (reportData: {
   assessment_id?: string;
   score: number;
   risk_level: number; // 0-100 mapped to risk level
+  conversation_history?: any[];
   report_details: any;
   weights: { scale: number; voice: number; expression: number };
 }) => {
   // 1. 如果有assessment_id，更新assessment
   let assessmentId = reportData.assessment_id;
+  const conversationHistory = reportData.conversation_history ?? reportData.report_details?.scaleData?.conversationHistory ?? [];
   
   if (assessmentId) {
     await updateAssessment(assessmentId, {
       score: reportData.score,
       risk_level: reportData.risk_level, // 这里的risk_level如果是0-10，需要转换
+      conversation_history: conversationHistory,
       report: {
         ...reportData.report_details,
         weights: reportData.weights,
@@ -436,12 +486,48 @@ export const syncReport = async (reportData: {
       },
     });
   } else {
+    const lowerBound = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+    const { data: recent, error: recentError } = await supabase
+      .from('assessments')
+      .select('id,report')
+      .eq('user_id', reportData.user_id)
+      .eq('assessment_type', 'fusion_report')
+      .gte('created_at', lowerBound)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    if (recentError) throw recentError;
+
+    const duplicate = (recent || []).find((item: any) => {
+      const report = item.report || {};
+      return (
+        report.scaleData?.score === reportData.report_details?.scaleData?.score &&
+        report.voiceData?.score === reportData.report_details?.voiceData?.score &&
+        report.expressionData?.depression_risk_score === reportData.report_details?.expressionData?.depression_risk_score
+      );
+    });
+
+    if (duplicate) {
+      await updateAssessment(duplicate.id, {
+        score: reportData.score,
+        risk_level: reportData.risk_level,
+        conversation_history: conversationHistory,
+        report: {
+          ...reportData.report_details,
+          weights: reportData.weights,
+          synced_at: new Date().toISOString(),
+        },
+      });
+      return duplicate.id;
+    }
+
     // 否则创建新的assessment
     const newAssessment = await createAssessment({
       user_id: reportData.user_id,
       assessment_type: 'fusion_report',
       score: reportData.score,
       risk_level: reportData.risk_level,
+      conversation_history: conversationHistory,
       report: {
         ...reportData.report_details,
         weights: reportData.weights,
@@ -664,6 +750,18 @@ export const handleRiskAlert = async (alertId: string, handledBy: string, notes?
 };
 
 export const createRiskAlert = async (alert: Partial<RiskAlert>) => {
+  if (alert.source_id) {
+    const { data: existing, error: existingError } = await supabase
+      .from('risk_alerts')
+      .select('*')
+      .eq('source_id', alert.source_id)
+      .eq('data_source', alert.data_source || 'fusion_report')
+      .maybeSingle();
+
+    if (existingError) throw existingError;
+    if (existing) return existing as RiskAlert;
+  }
+
   const { data, error } = await supabase
     .from('risk_alerts')
     .insert(alert)

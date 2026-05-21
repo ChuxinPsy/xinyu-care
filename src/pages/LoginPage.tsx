@@ -23,6 +23,7 @@ export default function LoginPage() {
   const location = useLocation();
 
   const from = (location.state as any)?.from || '/';
+  const safeUserRedirect = typeof from === 'string' && from.startsWith('/doctor') ? '/' : from;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,16 +64,16 @@ export default function LoginPage() {
         } else if (userRole === 'user') {
           // 普通用户账号，跳转到用户端
           toast.success('登录成功');
-          navigate(from, { replace: true });
+          navigate(safeUserRedirect, { replace: true });
         } else {
           // 角色未知或未设置
           toast.success('登录成功');
-          navigate(from, { replace: true });
+          navigate(safeUserRedirect, { replace: true });
         }
       } catch (err) {
         console.error('获取用户角色失败:', err);
         toast.success('登录成功');
-        navigate(from, { replace: true });
+        navigate(safeUserRedirect, { replace: true });
       }
     }
   };

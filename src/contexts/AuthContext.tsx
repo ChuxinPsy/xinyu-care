@@ -45,16 +45,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let mounted = true;
     let safetyTimer = setTimeout(() => {
       setLoading(false);
-    }, 1500);
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        getProfile(session.user.id).then(setProfile);
-      }
+    }, 3000);
+
+    const finishLoading = () => {
+      if (!mounted) return;
       setLoading(false);
       clearTimeout(safetyTimer);
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        getProfile(session.user.id).then((profileData) => {
+          if (!mounted) return;
+          setProfile(profileData);
+          finishLoading();
+        });
+      } else {
+        setProfile(null);
+        finishLoading();
+      }
+    }).catch(() => {
+      finishLoading();
     });
     // In this function, do NOT use any await calls. Use `.then()` instead to avoid deadlocks.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -67,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
       clearTimeout(safetyTimer);
     };
@@ -82,6 +99,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const uid = session?.user?.id;
       if (uid) {
         await (supabase.rpc as any)('link_username_to_user', { uid, uname: username });
+        const profileData = await getProfile(uid);
+        setProfile(profileData);
       }
       return { error: null };
     } catch (error) {
@@ -129,6 +148,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const { markCodeAsUsed } = await import('@/db/api');
           await markCodeAsUsed(verificationCode, uid);
         }
+
+        const profileData = await getProfile(uid);
+        setProfile(profileData);
       }
       return { error: null };
     } catch (error) {

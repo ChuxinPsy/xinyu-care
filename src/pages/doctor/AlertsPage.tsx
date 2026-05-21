@@ -10,7 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { getRiskAlerts, handleRiskAlert } from '@/db/api';
-import { generateMockAlerts } from '@/utils/mockData';
 import type { RiskAlert } from '@/types';
 
 export default function AlertsPage() {
@@ -34,30 +33,13 @@ export default function AlertsPage() {
         getRiskAlerts(true),
       ]);
       
-      // 如果没有真实数据，使用模拟数据
-      if (unhandled.length === 0 && handled.length === 0) {
-        const mockAlerts = generateMockAlerts(25);
-        const mockUnhandled = mockAlerts.filter(alert => !alert.is_handled).slice(0, 3);
-        const mockHandled = mockAlerts.filter(alert => alert.is_handled);
-        
-        setUnhandledAlerts(mockUnhandled);
-        setHandledAlerts(mockHandled);
-      } else {
-        setUnhandledAlerts(unhandled.slice(0, 3));
-        setHandledAlerts(handled);
-      }
+      setUnhandledAlerts(unhandled);
+      setHandledAlerts(handled);
     } catch (error) {
       console.error('加载预警失败:', error);
-      
-      // 出错时使用模拟数据
-      const mockAlerts = generateMockAlerts(25);
-      const mockUnhandled = mockAlerts.filter(alert => !alert.is_handled).slice(0, 3);
-      const mockHandled = mockAlerts.filter(alert => alert.is_handled);
-      
-      setUnhandledAlerts(mockUnhandled);
-      setHandledAlerts(mockHandled);
-      
-      toast.error('加载预警失败，显示模拟数据');
+      setUnhandledAlerts([]);
+      setHandledAlerts([]);
+      toast.error('加载预警失败，请检查医生权限或网络连接');
     } finally {
       setLoading(false);
     }

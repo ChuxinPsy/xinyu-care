@@ -48,6 +48,7 @@ export default function FusionReport({
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const reportRef = useRef<HTMLDivElement>(null);
+  const syncedSignatureRef = useRef<string | null>(null);
 
   // State
   const [fusionScore, setFusionScore] = useState(0);
@@ -101,10 +102,68 @@ export default function FusionReport({
     micro_expressions: '检测到轻微疲劳迹象'
   };
 
+  const normalizeVoiceData = (v: any) => {
+    if (!v) return v;
+    const base = v.reportData ? { ...v.reportData, duration: v.duration, waveform: v.waveform } : v;
+    const emotionVector = base.emotions || base.emotion_vector || {};
+    const sadRisk = Math.round(((emotionVector.sad ?? 0) + (emotionVector.fearful ?? emotionVector.fear ?? 0)) * 50);
+    const indicatorRisk = base.indicators
+      ? [base.indicators.isLowSpeed, base.indicators.isHighPitchDrop, base.indicators.isLongPause].filter(Boolean).length * 12
+      : 0;
+    const score = base.score ?? base.risk_score ?? base.emotion_score ?? Math.min(100, Math.max(0, sadRisk + indicatorRisk));
+    return {
+      ...base,
+      score,
+      risk_score: base.risk_score ?? score,
+      emotion_score: base.emotion_score ?? score,
+      emotions: {
+        calm: emotionVector.calm ?? 0,
+        happy: emotionVector.happy ?? 0,
+        sad: emotionVector.sad ?? 0,
+        angry: emotionVector.angry ?? 0,
+        fear: emotionVector.fear ?? emotionVector.fearful ?? 0,
+        surprise: emotionVector.surprise ?? emotionVector.surprised ?? 0,
+      },
+      speech_rate: base.speech_rate ?? (Number(base.speech_metrics?.speed) || undefined),
+      pitch_variation: base.pitch_variation ?? (Number(base.speech_metrics?.tone) || undefined),
+      pause_frequency: base.pause_frequency ?? (Number(base.speech_metrics?.pause) || undefined),
+      analysis: base.analysis ?? base.depression_analysis,
+    };
+  };
+
+  const normalizeExpressionData = (e: any) => {
+    if (!e) return e;
+    const base = e.reportData ?? e;
+    const facial = base.facial_expressions || base.emotion_radar || {};
+    return {
+      ...base,
+      depression_risk_score: base.depression_risk_score ?? base.risk_score ?? 0,
+      risk_score: base.risk_score ?? base.depression_risk_score ?? 0,
+      facial_expressions: facial,
+    };
+  };
+
+  const normalizeScaleData = (s: any) => {
+    if (!s) return s;
+    const score = s.score ?? s.phq9_score ?? 0;
+    return {
+      ...s,
+      score,
+      phq9_score: s.phq9_score ?? score,
+      risk_level: s.risk_level ?? s.riskLevel,
+    };
+  };
+
   // 检查是否有有效数据的辅助函数
   const hasValidScaleData = (s: any) => s && (typeof s.score === 'number' || typeof s.phq9_score === 'number');
-  const hasValidVoiceData = (v: any) => v && (typeof v.score === 'number' || typeof v.risk_score === 'number' || typeof v.emotion_score === 'number');
-  const hasValidExpressionData = (e: any) => e && (typeof e.depression_risk_score === 'number' || typeof e.risk_score === 'number');
+  const hasValidVoiceData = (v: any) => {
+    const normalized = normalizeVoiceData(v);
+    return normalized && (typeof normalized.score === 'number' || typeof normalized.risk_score === 'number' || typeof normalized.emotion_score === 'number');
+  };
+  const hasValidExpressionData = (e: any) => {
+    const normalized = normalizeExpressionData(e);
+    return normalized && (typeof normalized.depression_risk_score === 'number' || typeof normalized.risk_score === 'number');
+  };
 
   // State for data (either from props or fetched)
   const [data, setData] = useState<{
@@ -112,9 +171,9 @@ export default function FusionReport({
     voice: any;
     expression: any;
   }>({ 
-    scale: hasValidScaleData(scaleData) ? scaleData : mockScaleData, 
-    voice: hasValidVoiceData(voiceData) ? voiceData : mockVoiceData, 
-    expression: hasValidExpressionData(expressionData) ? expressionData : mockExpressionData 
+    scale: hasValidScaleData(scaleData) ? normalizeScaleData(scaleData) : mockScaleData, 
+    voice: hasValidVoiceData(voiceData) ? normalizeVoiceData(voiceData) : mockVoiceData, 
+    expression: hasValidExpressionData(expressionData) ? normalizeExpressionData(expressionData) : mockExpressionData 
   });
 
   // Score helpers to robustly read fields from different data shapes
@@ -235,9 +294,9 @@ export default function FusionReport({
       // FIX: Ensure local state updates when props change for real-time sync
       // 使用有效数据或示例数据
       const newData = { 
-        scale: hasValidScaleData(scaleData) ? scaleData : mockScaleData, 
-        voice: hasValidVoiceData(voiceData) ? voiceData : mockVoiceData, 
-        expression: hasValidExpressionData(expressionData) ? expressionData : mockExpressionData 
+        scale: hasValidScaleData(scaleData) ? normalizeScaleData(scaleData) : mockScaleData, 
+        voice: hasValidVoiceData(voiceData) ? normalizeVoiceData(voiceData) : mockVoiceData, 
+        expression: hasValidExpressionData(expressionData) ? normalizeExpressionData(expressionData) : mockExpressionData 
       };
       setData(newData);
       // 使用最新的 weights 计算
@@ -250,6 +309,13 @@ export default function FusionReport({
       else if (score >= 40) level = 'medium';
       else level = 'low';
       setRiskLevel(level);
+      if (syncStatus === 'idle') {
+        handleSync(score, level, {
+          scale: calculateScaleNormalized(getScaleScore(newData.scale)),
+          voice: getVoiceScore(newData.voice),
+          expression: getExpressionScore(newData.expression),
+        }, newData.scale, newData.voice, newData.expression);
+      }
     }
   }, [scaleData, voiceData, expressionData, weights, assessmentId]);
 
@@ -295,9 +361,9 @@ export default function FusionReport({
         const latest = assessments[0];
         if (latest.report?.scaleData || latest.report?.voiceData || latest.report?.expressionData) {
            const newData = {
-             scale: latest.report.scaleData,
-             voice: latest.report.voiceData,
-             expression: latest.report.expressionData
+             scale: normalizeScaleData(latest.report.scaleData),
+             voice: normalizeVoiceData(latest.report.voiceData),
+             expression: normalizeExpressionData(latest.report.expressionData)
            };
            setData(newData);
            calculateFusion(newData.scale, newData.voice, newData.expression);
@@ -374,9 +440,9 @@ export default function FusionReport({
 
     if (item && item.report) {
        const newData = {
-         scale: item.report.scaleData,
-         voice: item.report.voiceData,
-         expression: item.report.expressionData
+         scale: normalizeScaleData(item.report.scaleData),
+         voice: normalizeVoiceData(item.report.voiceData),
+         expression: normalizeExpressionData(item.report.expressionData)
        };
        setData(newData);
 
@@ -400,15 +466,18 @@ export default function FusionReport({
     }
   };
 
+  const calculateScaleNormalized = (scaleRaw: number) => {
+    if (scaleRaw <= 4) return scaleRaw * 5;
+    if (scaleRaw <= 9) return 20 + (scaleRaw - 5) * 4;
+    if (scaleRaw <= 14) return 40 + (scaleRaw - 10) * 4;
+    if (scaleRaw <= 19) return 60 + (scaleRaw - 15) * 4;
+    return 80 + (scaleRaw - 20) * 2.5;
+  };
+
   // 计算融合分数的纯函数版本
   const calculateFusionScore = (sData: any, vData: any, eData: any, w: any) => {
     const scaleRaw = getScaleScore(sData);
-    let scaleNormalized = 0;
-    if (scaleRaw <= 4) scaleNormalized = scaleRaw * 5;
-    else if (scaleRaw <= 9) scaleNormalized = 20 + (scaleRaw - 5) * 4;
-    else if (scaleRaw <= 14) scaleNormalized = 40 + (scaleRaw - 10) * 4;
-    else if (scaleRaw <= 19) scaleNormalized = 60 + (scaleRaw - 15) * 4;
-    else scaleNormalized = 80 + (scaleRaw - 20) * 2.5; // Cap at 100
+    const scaleNormalized = calculateScaleNormalized(scaleRaw);
 
     const voiceNormalized = getVoiceScore(vData); // 0-100
     const expressionNormalized = getExpressionScore(eData); // 0-100
@@ -424,12 +493,7 @@ export default function FusionReport({
 
   const calculateFusion = (sData: any, vData: any, eData: any) => {
     const scaleRaw = getScaleScore(sData);
-    let scaleNormalized = 0;
-    if (scaleRaw <= 4) scaleNormalized = scaleRaw * 5;
-    else if (scaleRaw <= 9) scaleNormalized = 20 + (scaleRaw - 5) * 4;
-    else if (scaleRaw <= 14) scaleNormalized = 40 + (scaleRaw - 10) * 4;
-    else if (scaleRaw <= 19) scaleNormalized = 60 + (scaleRaw - 15) * 4;
-    else scaleNormalized = 80 + (scaleRaw - 20) * 2.5; // Cap at 100
+    const scaleNormalized = calculateScaleNormalized(scaleRaw);
 
     const voiceNormalized = getVoiceScore(vData); // 0-100
     const expressionNormalized = getExpressionScore(eData); // 0-100
@@ -451,31 +515,42 @@ export default function FusionReport({
 
     setRiskLevel(level);
 
-    // Check for High Risk Warning
-    checkHighRisk(score, scaleRaw, voiceNormalized, expressionNormalized);
-
-    // Auto Sync
-    if (syncStatus === 'idle' && !assessmentId && (sData || vData || eData)) {
-      handleSync(score, level, { scale: scaleNormalized, voice: voiceNormalized, expression: expressionNormalized }, sData, vData, eData);
-    }
+    // Viewing profile/history reports is read-only. New assessments are synced only
+    // from the explicit assessment flow where fresh module data is passed as props.
   };
 
-  const checkHighRisk = async (score: number, scaleRaw: number, voiceScore: number, expressionScore: number) => {
-    const isHighRisk = 
-      score >= 80 || 
-      scaleRaw >= 20 || 
-      (voiceScore >= 80 && expressionScore >= 80);
+  const createAssessmentAlert = async (
+    assessmentId: string | undefined,
+    score: number,
+    scaleRaw: number,
+    voiceScore: number,
+    expressionScore: number
+  ) => {
+    if (profile?.role !== 'user') return;
 
-    if (isHighRisk && !assessmentId) {
-      // Create Risk Alert
+    const requiresAlert =
+      score >= 40 ||
+      scaleRaw >= 10 ||
+      (voiceScore >= 60 && expressionScore >= 60);
+
+    if (requiresAlert && !assessmentId?.startsWith('demo-')) {
       try {
+        const riskLevel10 = Math.min(10, Math.max(1, Math.ceil(score / 10)));
+        const alertType =
+          score >= 80 || scaleRaw >= 20
+            ? '极高风险预警'
+            : score >= 60 || scaleRaw >= 15
+            ? '高风险预警'
+            : '中风险预警';
+
         await createRiskAlert({
           patient_id: user?.id,
-          alert_type: 'fusion_risk_high',
-          risk_level: score,
-          description: `融合风险分值 ${score} (PHQ-9: ${scaleRaw}, Voice: ${voiceScore}, Expression: ${expressionScore})`,
+          alert_type: alertType,
+          risk_level: riskLevel10,
+          description: `融合风险分值 ${score}/100，量表 ${scaleRaw}/27，语音 ${voiceScore}/100，表情 ${expressionScore}/100。建议医生尽快查看评估详情并进行随访。`,
           is_handled: false,
-          data_source: 'fusion_report'
+          data_source: 'fusion_report',
+          source_id: assessmentId,
         });
         toast.error('检测到高风险指标，已自动推送至医生工作台');
       } catch (e) {
@@ -485,25 +560,52 @@ export default function FusionReport({
   };
 
   const handleSync = async (score: number, level: string, normalizedScores: any, sData: any, vData: any, eData: any, retryCount = 0) => {
+    const signature = [
+      user?.id,
+      getScaleScore(sData),
+      getVoiceScore(vData),
+      getExpressionScore(eData),
+      JSON.stringify(normalizedScores),
+    ].join('|');
+
+    if (retryCount === 0 && syncedSignatureRef.current === signature) {
+      return;
+    }
+
+    syncedSignatureRef.current = signature;
     setSyncStatus('syncing');
     setSyncProgress(10);
     
     try {
-      await syncReport({
+      const normalizedScale = normalizeScaleData(sData);
+      const normalizedVoice = normalizeVoiceData(vData);
+      const normalizedExpression = normalizeExpressionData(eData);
+      const conversationHistory = normalizedScale?.conversationHistory || normalizedScale?.conversation_history || [];
+
+      const syncedAssessmentId = await syncReport({
         user_id: user?.id || '',
         score: score,
         risk_level: score, // Store as 0-100
+        conversation_history: conversationHistory,
         report_details: {
-          scaleRaw: sData?.score,
+          scaleRaw: normalizedScale?.score,
           normalizedScores,
-          scaleData: sData,
-          voiceData: vData,
-          expressionData: eData,
+          scaleData: normalizedScale,
+          voiceData: normalizedVoice,
+          expressionData: normalizedExpression,
           advice: advice, // Save generated advice
           generatedAt: new Date().toISOString()
         },
         weights
       });
+
+      await createAssessmentAlert(
+        syncedAssessmentId || undefined,
+        score,
+        normalizedScale?.score ?? 0,
+        getVoiceScore(normalizedVoice),
+        getExpressionScore(normalizedExpression)
+      );
 
       setSyncStatus('success');
       toast.success('报告已同步至云端');
@@ -518,6 +620,7 @@ export default function FusionReport({
         }, 1000);
       } else {
         setSyncStatus('error');
+        syncedSignatureRef.current = null;
         toast.error('同步失败，请重试');
       }
     }
@@ -692,9 +795,25 @@ export default function FusionReport({
   ];
 
   const fetchHistory = async () => {
-    // 只使用示例数据，显示5个不同等级的报告
-    setHistoryList(demoHistoryData);
-    setLoadingHistory(false);
+    if (!user) {
+      setHistoryList([]);
+      setLoadingHistory(false);
+      return;
+    }
+
+    setLoadingHistory(true);
+    try {
+      const assessments = await getAssessments(user.id, 50);
+      setHistoryList(assessments.filter(item =>
+        item.report?.scaleData || item.report?.voiceData || item.report?.expressionData
+      ));
+    } catch (error) {
+      console.error('Failed to fetch report history', error);
+      toast.error('历史记录加载失败');
+      setHistoryList([]);
+    } finally {
+      setLoadingHistory(false);
+    }
   };
 
   const handleDownload = async (format: 'png' | 'pdf') => {

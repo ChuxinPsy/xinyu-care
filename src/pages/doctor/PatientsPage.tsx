@@ -18,6 +18,56 @@ import {
 
 // ==================== 子组件 ====================
 
+const getScaleData = (assessment: any) => assessment.report?.scaleData ?? assessment.report?.scale_data ?? null;
+
+const getVoiceData = (assessment: any) => {
+  const voice = assessment.report?.voiceData ?? assessment.report?.voice_data ?? null;
+  if (!voice) return null;
+  const base = voice.reportData ? { ...voice.reportData, duration: voice.duration, waveform: voice.waveform } : voice;
+  const emotionVector = base.emotions || base.emotion_vector || {};
+  const sadRisk = Math.round(((emotionVector.sad ?? 0) + (emotionVector.fearful ?? emotionVector.fear ?? 0)) * 50);
+  const indicatorRisk = base.indicators
+    ? [base.indicators.isLowSpeed, base.indicators.isHighPitchDrop, base.indicators.isLongPause].filter(Boolean).length * 12
+    : 0;
+  const score = base.score ?? base.risk_score ?? base.emotion_score ?? Math.min(100, Math.max(0, sadRisk + indicatorRisk));
+  return {
+    ...base,
+    score,
+    risk_score: base.risk_score ?? score,
+    emotion_score: base.emotion_score ?? score,
+    emotions: {
+      calm: emotionVector.calm ?? 0,
+      happy: emotionVector.happy ?? 0,
+      sad: emotionVector.sad ?? 0,
+      angry: emotionVector.angry ?? 0,
+      fear: emotionVector.fear ?? emotionVector.fearful ?? 0,
+      surprise: emotionVector.surprise ?? emotionVector.surprised ?? 0,
+    },
+    speech_rate: base.speech_rate ?? (Number(base.speech_metrics?.speed) || undefined),
+    pitch_variation: base.pitch_variation ?? (Number(base.speech_metrics?.tone) || undefined),
+    pause_frequency: base.pause_frequency ?? (Number(base.speech_metrics?.pause) || undefined),
+    analysis: base.analysis ?? base.depression_analysis,
+  };
+};
+
+const getExpressionData = (assessment: any) => {
+  const expression = assessment.report?.expressionData ?? assessment.report?.expression_data ?? null;
+  if (!expression) return null;
+  const base = expression.reportData ?? expression;
+  return {
+    ...base,
+    depression_risk_score: base.depression_risk_score ?? base.risk_score ?? 0,
+    risk_score: base.risk_score ?? base.depression_risk_score ?? 0,
+    facial_expressions: base.facial_expressions || base.emotion_radar || {},
+    micro_features: base.micro_features || base.micro_expressions || {},
+  };
+};
+
+const getConversationHistory = (assessment: any) =>
+  assessment.conversation_history?.length
+    ? assessment.conversation_history
+    : assessment.report?.scaleData?.conversationHistory || assessment.report?.scaleData?.conversation_history || [];
+
 // 量表评估报告面板
 function ScaleReportPanel({ assessments }: { assessments: any[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -36,7 +86,7 @@ function ScaleReportPanel({ assessments }: { assessments: any[] }) {
   };
 
   const scaleAssessments = assessments.filter(a =>
-    a.report?.scaleData || a.assessment_type?.includes('scale') || a.assessment_type?.includes('fusion')
+    getScaleData(a) || a.assessment_type?.includes('scale') || a.assessment_type?.includes('fusion')
   );
 
   if (scaleAssessments.length === 0) {
@@ -51,7 +101,7 @@ function ScaleReportPanel({ assessments }: { assessments: any[] }) {
   return (
     <div className="space-y-4">
       {scaleAssessments.map((assessment) => {
-        const scaleData = assessment.report?.scaleData;
+        const scaleData = getScaleData(assessment);
         const score = scaleData?.score ?? scaleData?.phq9_score ?? assessment.score ?? 0;
         const riskLevel = assessment.risk_level ?? 0;
         const dimensionScores = scaleData?.dimensionScores || [];
@@ -181,7 +231,7 @@ function VoiceReportPanel({ assessments }: { assessments: any[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const voiceAssessments = assessments.filter(a =>
-    a.report?.voiceData || a.assessment_type?.includes('voice')
+    getVoiceData(a) || a.assessment_type?.includes('voice') || a.assessment_type?.includes('fusion')
   );
 
   if (voiceAssessments.length === 0) {
@@ -196,7 +246,7 @@ function VoiceReportPanel({ assessments }: { assessments: any[] }) {
   return (
     <div className="space-y-4">
       {voiceAssessments.map((assessment) => {
-        const voiceData = assessment.report?.voiceData;
+        const voiceData = getVoiceData(assessment);
         const score = voiceData?.score ?? voiceData?.emotion_score ?? voiceData?.risk_score ?? 0;
         const isExpanded = expandedId === assessment.id;
 
@@ -321,7 +371,7 @@ function ExpressionReportPanel({ assessments }: { assessments: any[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const expressionAssessments = assessments.filter(a =>
-    a.report?.expressionData || a.assessment_type?.includes('expression') || a.assessment_type?.includes('fusion')
+    getExpressionData(a) || a.assessment_type?.includes('expression') || a.assessment_type?.includes('fusion')
   );
 
   if (expressionAssessments.length === 0) {
@@ -336,7 +386,7 @@ function ExpressionReportPanel({ assessments }: { assessments: any[] }) {
   return (
     <div className="space-y-4">
       {expressionAssessments.map((assessment) => {
-        const exprData = assessment.report?.expressionData;
+        const exprData = getExpressionData(assessment);
         const score = exprData?.depression_risk_score ?? exprData?.risk_score ?? 0;
         const isExpanded = expandedId === assessment.id;
 
@@ -478,7 +528,7 @@ function ConversationPanel({ assessments }: { assessments: any[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const assessmentsWithHistory = assessments.filter(a =>
-    a.conversation_history && a.conversation_history.length > 0
+    getConversationHistory(a).length > 0
   );
 
   if (assessmentsWithHistory.length === 0) {
@@ -493,7 +543,7 @@ function ConversationPanel({ assessments }: { assessments: any[] }) {
   return (
     <div className="space-y-4">
       {assessmentsWithHistory.map((assessment) => {
-        const history: any[] = assessment.conversation_history || [];
+        const history: any[] = getConversationHistory(assessment);
         const isExpanded = expandedId === assessment.id;
         // 过滤掉 system 消息，只展示 user 和 assistant
         const dialogHistory = history.filter((m: any) => m.role !== 'system');
@@ -625,10 +675,10 @@ export default function PatientsPage() {
   const assessments = patientDetails?.assessments ?? [];
 
   // 统计信息
-  const scaleCount = useMemo(() => assessments.filter((a: any) => a.report?.scaleData || a.assessment_type?.includes('fusion')).length, [assessments]);
-  const voiceCount = useMemo(() => assessments.filter((a: any) => a.report?.voiceData).length, [assessments]);
-  const expressionCount = useMemo(() => assessments.filter((a: any) => a.report?.expressionData).length, [assessments]);
-  const conversationCount = useMemo(() => assessments.filter((a: any) => a.conversation_history?.length > 0).length, [assessments]);
+  const scaleCount = useMemo(() => assessments.filter((a: any) => getScaleData(a) || a.assessment_type?.includes('fusion')).length, [assessments]);
+  const voiceCount = useMemo(() => assessments.filter((a: any) => getVoiceData(a)).length, [assessments]);
+  const expressionCount = useMemo(() => assessments.filter((a: any) => getExpressionData(a)).length, [assessments]);
+  const conversationCount = useMemo(() => assessments.filter((a: any) => getConversationHistory(a).length > 0).length, [assessments]);
 
   return (
     <div className="space-y-6">

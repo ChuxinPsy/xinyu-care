@@ -20,7 +20,7 @@ function matchPublicRoute(path: string, patterns: string[]) {
 }
 
 export function RouteGuard({ children }: RouteGuardProps) {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,13 +31,43 @@ export function RouteGuard({ children }: RouteGuardProps) {
 
     if (!user && !isPublic) {
       navigate('/login', { state: { from: location.pathname }, replace: true });
+      return;
     }
-  }, [user, loading, location.pathname, navigate]);
+
+    if (user && location.pathname.startsWith('/doctor')) {
+      if (!profile) return;
+      if (profile.role !== 'doctor' && profile.role !== 'admin') {
+        navigate('/profile', { replace: true });
+      }
+    }
+  }, [user, profile, loading, location.pathname, navigate]);
 
   if (loading) {
     return (
       <div style={{ padding: 24, fontSize: 14 }}>
         正在加载...
+      </div>
+    );
+  }
+
+  if (user && location.pathname.startsWith('/doctor') && !profile) {
+    return (
+      <div style={{ padding: 24, fontSize: 14 }}>
+        正在加载医生权限...
+      </div>
+    );
+  }
+
+  if (
+    user &&
+    location.pathname.startsWith('/doctor') &&
+    profile &&
+    profile.role !== 'doctor' &&
+    profile.role !== 'admin'
+  ) {
+    return (
+      <div style={{ padding: 24, fontSize: 14 }}>
+        当前账号没有医生后台权限，正在返回个人中心...
       </div>
     );
   }

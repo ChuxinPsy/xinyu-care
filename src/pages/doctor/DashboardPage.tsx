@@ -3,11 +3,81 @@ import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getAllProfiles, getAssessments, getEmotionDiaries, getRiskAlerts } from '@/db/api';
+import { getAllAssessments, getAllEmotionDiaries, getAllProfiles, getRiskAlerts } from '@/db/api';
 import ImageCarousel from '@/components/common/ImageCarousel';
-import { generateMockAlerts, generateEmotionTrendData, generateAssessmentDistribution } from '@/utils/mockData';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import type { Profile, RiskAlert } from '@/types';
+import type { Assessment, EmotionDiary, Profile, RiskAlert } from '@/types';
+
+const emotionScores: Record<EmotionDiary['emotion_level'], number> = {
+  very_bad: 1,
+  bad: 2,
+  neutral: 3,
+  good: 4,
+  very_good: 5,
+};
+
+const assessmentColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
+
+function toLocalDateKey(value: string | Date) {
+  const date = typeof value === 'string' ? new Date(value) : value;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function buildEmotionTrendData(diaries: EmotionDiary[]) {
+  const grouped = new Map<string, number[]>();
+
+  diaries.forEach((diary) => {
+    const score = emotionScores[diary.emotion_level];
+    if (!score) return;
+    const key = toLocalDateKey(diary.diary_date);
+    grouped.set(key, [...(grouped.get(key) ?? []), score]);
+  });
+
+  return Array.from({ length: 30 }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (29 - index));
+    const key = toLocalDateKey(date);
+    const scores = grouped.get(key) ?? [];
+    const score = scores.length
+      ? Number((scores.reduce((sum, item) => sum + item, 0) / scores.length).toFixed(1))
+      : null;
+
+    return {
+      date: key,
+      score,
+      label: `${date.getMonth() + 1}/${date.getDate()}`,
+    };
+  });
+}
+
+function getAssessmentLabel(assessment: Assessment) {
+  const type = `${assessment.assessment_type || ''}`.toLowerCase();
+  const report = assessment.report ?? {};
+
+  if (type.includes('voice') || report.voiceData) return '语音情绪';
+  if (type.includes('expression') || type.includes('face') || report.expressionData) return '表情识别';
+  if (type.includes('htp')) return '房树人评估';
+  if (type.includes('fusion') || type.includes('multimodal')) return '多模态融合';
+  if (type.includes('scale') || report.scaleData) return '量表评估';
+  return '其他评估';
+}
+
+function buildAssessmentDistribution(assessments: Assessment[]) {
+  const counts = new Map<string, number>();
+  assessments.forEach((assessment) => {
+    const label = getAssessmentLabel(assessment);
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  });
+
+  return Array.from(counts.entries()).map(([name, value], index) => ({
+    name,
+    value,
+    color: assessmentColors[index % assessmentColors.length],
+  }));
+}
 
 export default function DoctorDashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -28,42 +98,44 @@ export default function DoctorDashboardPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [profiles, alerts] = await Promise.all([
+      const [profiles, alerts, assessments, diaries] = await Promise.all([
         getAllProfiles(),
         getRiskAlerts(false),
+        getAllAssessments(),
+        getAllEmotionDiaries(),
       ]);
 
       const patients = profiles.filter(p => p.role === 'user');
-      
-      // 如果没有真实数据，使用模拟数据
-      const mockAlerts = alerts.length === 0 ? generateMockAlerts(15) : alerts;
-      
+      const todayKey = toLocalDateKey(new Date());
+      const todayAssessments = assessments.filter(item => toLocalDateKey(item.created_at) === todayKey);
+      const recentDiaryScores = diaries
+        .map((diary) => emotionScores[diary.emotion_level])
+        .filter((score): score is number => Boolean(score));
+      const avgEmotionScore = recentDiaryScores.length
+        ? recentDiaryScores.reduce((sum, score) => sum + score, 0) / recentDiaryScores.length
+        : 0;
+
       setStats({
-        totalPatients: patients.length || 156, // 使用模拟数据
-        activeAlerts: mockAlerts.filter(a => !a.is_handled).length,
-        todayAssessments: Math.floor(Math.random() * 20) + 15, // 模拟数据
-        avgEmotionScore: 3.2 + Math.random() * 0.8, // 模拟数据
+        totalPatients: patients.length,
+        activeAlerts: alerts.length,
+        todayAssessments: todayAssessments.length,
+        avgEmotionScore,
       });
 
-      setRecentAlerts(mockAlerts.slice(0, 3));
-      
-      // 生成图表数据
-      setEmotionTrendData(generateEmotionTrendData());
-      setAssessmentData(generateAssessmentDistribution());
+      setRecentAlerts(alerts.slice(0, 3));
+      setEmotionTrendData(buildEmotionTrendData(diaries));
+      setAssessmentData(buildAssessmentDistribution(assessments));
     } catch (error) {
       console.error('加载数据失败:', error);
-      
-      // 出错时使用模拟数据
-      const mockAlerts = generateMockAlerts(15);
       setStats({
-        totalPatients: 156,
-        activeAlerts: mockAlerts.filter(a => !a.is_handled).length,
-        todayAssessments: 24,
-        avgEmotionScore: 3.6,
+        totalPatients: 0,
+        activeAlerts: 0,
+        todayAssessments: 0,
+        avgEmotionScore: 0,
       });
-      setRecentAlerts(mockAlerts.slice(0, 3));
-      setEmotionTrendData(generateEmotionTrendData());
-      setAssessmentData(generateAssessmentDistribution());
+      setRecentAlerts([]);
+      setEmotionTrendData(buildEmotionTrendData([]));
+      setAssessmentData([]);
     } finally {
       setLoading(false);
     }
@@ -152,7 +224,7 @@ export default function DoctorDashboardPage() {
 
         <Card className="glass border-success/20 shadow-success-glow card-hover-glow animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
           <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-3 md:p-6">
-            <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">完成评估</CardTitle>
+            <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">平均情绪</CardTitle>
             <div className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-br from-success to-success/70 flex items-center justify-center shadow-success-glow">
               <TrendingUp className="w-3.5 h-3.5 md:w-5 md:h-5 text-white" />
             </div>
@@ -165,7 +237,7 @@ export default function DoctorDashboardPage() {
                 <div className="text-xl md:text-3xl font-bold gradient-text mb-0.5 md:mb-1">{stats.avgEmotionScore.toFixed(1)}</div>
                 <p className="text-[10px] md:text-xs text-muted-foreground flex items-center gap-1">
                   <span className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-success animate-pulse" />
-                  满分5.0
+                  近30天 / 满分5.0
                 </p>
               </>
             )}
@@ -246,7 +318,7 @@ export default function DoctorDashboardPage() {
               <div className="h-48 md:h-64 flex flex-col items-center justify-center text-muted-foreground bg-gradient-to-br from-muted/30 to-muted/10 rounded-xl border border-dashed border-border">
                 <Skeleton className="w-full h-full rounded-xl" />
               </div>
-            ) : (
+            ) : emotionTrendData.some((item) => item.score !== null) ? (
               <div className="h-48 md:h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={emotionTrendData}>
@@ -272,7 +344,7 @@ export default function DoctorDashboardPage() {
                         borderRadius: '8px',
                         fontSize: '12px'
                       }}
-                      formatter={(value: any) => [`${value}分`, '情绪评分']}
+                      formatter={(value: any) => [value === null ? '无记录' : `${value}分`, '情绪评分']}
                       labelFormatter={(label) => `${label}`}
                     />
                     <Line 
@@ -285,6 +357,10 @@ export default function DoctorDashboardPage() {
                     />
                   </LineChart>
                 </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-48 md:h-64 flex items-center justify-center text-sm text-muted-foreground bg-muted/20 rounded-xl border border-dashed border-border">
+                暂无近30天情绪日记数据
               </div>
             )}
           </CardContent>
@@ -304,7 +380,7 @@ export default function DoctorDashboardPage() {
               <div className="h-64 md:h-72 flex flex-col items-center justify-center text-muted-foreground bg-gradient-to-br from-muted/30 to-muted/10 rounded-xl border border-dashed border-border">
                 <Skeleton className="w-full h-full rounded-xl" />
               </div>
-            ) : (
+            ) : assessmentData.length > 0 ? (
               <div className="h-72 md:h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
@@ -356,6 +432,10 @@ export default function DoctorDashboardPage() {
                     />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-64 md:h-72 flex items-center justify-center text-sm text-muted-foreground bg-muted/20 rounded-xl border border-dashed border-border">
+                暂无评估记录数据
               </div>
             )}
           </CardContent>
