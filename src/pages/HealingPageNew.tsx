@@ -107,10 +107,19 @@ const meditationTracks = rawMusicFiles
     const nameWithoutExt = fileName.replace(/\.(mp3|ogg|wav|m4a)$/i, '');
     const [title, artist] = nameWithoutExt.split(' - ');
     const url = `${MUSIC_BASE_URL}/${encodeURIComponent(fileName)}`;
+    const contentIdByTitle: Record<string, string> = {
+      '焦虑缓解呼吸法': 'dddd4444-4444-4444-4444-444444444444',
+      '睡前放松引导': 'eeee5555-5555-5555-5555-555555555555',
+      '身体扫描冥想': 'ffff6666-6666-6666-6666-666666666666',
+      '专注力训练': '9999aaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+      '抑郁症康复之路': '77778888-8888-8888-8888-888888888888',
+    };
+    const resolvedTitle = (title || nameWithoutExt).trim();
     return {
       id: fileName,
+      contentId: contentIdByTitle[resolvedTitle],
       url,
-      title: (title || nameWithoutExt).trim(),
+      title: resolvedTitle,
       artist: (artist || '').trim(),
       fileName,
       category,
@@ -138,6 +147,11 @@ export default function HealingPageNew() {
   const [meditationStats, setMeditationStats] = useState({ totalMinutes: 128, totalSessions: 12, averageRating: 0 });
   const [moodDialogOpen, setMoodDialogOpen] = useState(false);
   const [moodAfter, setMoodAfter] = useState('');
+  const [completedSession, setCompletedSession] = useState<{
+    contentId: string;
+    title: string;
+    duration: number;
+  } | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const preloadRef = useRef<HTMLAudioElement | null>(null);
   const loopModeRef = useRef<LoopMode>('all');
@@ -281,27 +295,27 @@ export default function HealingPageNew() {
     const onEnded = () => {
       setBuffering(false);
       if (meditationTracks.length === 0) return;
-      wantPlayRef.current = true;
-      const mode = loopModeRef.current;
-      const current = trackIndexRef.current;
-      if (mode === 'one') {
-        audio.currentTime = 0;
-        audio.play().catch(() => {});
+      const current = meditationTracks[trackIndexRef.current];
+      if (!current?.contentId) {
+        console.warn(`冥想内容缺少 contentId 映射: ${current?.title || 'unknown'}`);
+        wantPlayRef.current = false;
+        setIsPlaying(false);
         return;
       }
-      if (mode === 'shuffle') {
-        const next = meditationTracks.length <= 1 ? current : (() => {
-          let candidate = current;
-          while (candidate === current) {
-            candidate = Math.floor(Math.random() * meditationTracks.length);
-          }
-          return candidate;
-        })();
-        setTrackIndex(next);
-        return;
-      }
-      const next = (current + 1) % meditationTracks.length;
-      setTrackIndex(next);
+      const completedDuration = Math.max(
+        Math.floor(Number.isFinite(audio.duration) ? audio.duration : 0),
+        Math.floor(audio.currentTime || 0),
+        totalTime || 0
+      );
+      wantPlayRef.current = false;
+      setIsPlaying(false);
+      setCurrentTime(completedDuration);
+      setCompletedSession({
+        contentId: current.contentId,
+        title: current.title,
+        duration: completedDuration,
+      });
+      setMoodDialogOpen(true);
     };
     const onError = () => {
       const current = meditationTracks[trackIndexRef.current];
@@ -426,23 +440,33 @@ export default function HealingPageNew() {
   const handleMeditationComplete = () => {
     const audio = audioRef.current;
     if (audio) audio.pause();
+    const currentTrack = meditationTracks[trackIndex];
+    if (!currentTrack?.contentId) {
+      toast.error('当前冥想内容缺少保存映射');
+      return;
+    }
+    setCompletedSession({
+      contentId: currentTrack.contentId,
+      title: currentTrack.title,
+      duration: Math.max(currentTime, totalTime ? Math.min(currentTime, totalTime) : currentTime),
+    });
     setMoodDialogOpen(true);
   };
 
   const handleSaveMood = async () => {
-    const currentTrack = meditationTracks[trackIndex];
-    if (!user || !currentTrack) return;
+    if (!user || !completedSession) return;
     try {
       await createMeditationSession({
         user_id: user.id,
-        content_id: currentTrack.id,
-        duration: currentTime,
+        content_id: completedSession.contentId,
+        duration: Math.max(1, completedSession.duration),
         completed: true,
         mood_after: moodAfter,
       });
       toast.success('冥想记录已保存');
       setMoodDialogOpen(false);
       setMoodAfter('');
+      setCompletedSession(null);
       setCurrentTime(0);
       await loadMeditationStats();
     } catch (error) {
@@ -1066,9 +1090,16 @@ export default function HealingPageNew() {
               <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 冥想完成
               </DialogTitle>
-              <p className="text-muted-foreground mt-2">恭喜你完成了 {Math.floor(currentTime / 60)} 分钟的冥想练习</p>
+              <p className="text-muted-foreground mt-2">
+                恭喜你完成了 {completedSession ? Math.max(1, Math.floor(completedSession.duration / 60)) : Math.floor(currentTime / 60)} 分钟的冥想练习
+              </p>
             </DialogHeader>
             <div className="space-y-4 py-4">
+              {completedSession && (
+                <div className="rounded-2xl bg-slate-50 dark:bg-slate-800/70 px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                  本次内容：{completedSession.title}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="moodAfter" className="text-foreground font-medium">现在的感受如何？</Label>
                 <Textarea
@@ -1084,7 +1115,11 @@ export default function HealingPageNew() {
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                onClick={() => setMoodDialogOpen(false)}
+                onClick={() => {
+                  setMoodDialogOpen(false);
+                  setMoodAfter('');
+                  setCompletedSession(null);
+                }}
                 className="flex-1 rounded-xl border-slate-200 hover:bg-slate-100 transition-all"
               >
                 跳过

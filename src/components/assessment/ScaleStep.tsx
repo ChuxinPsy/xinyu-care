@@ -12,7 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
 import { getKnowledgeBase } from '@/db/api';
-import { openRouterChatCompletion, formatAIResponse } from '@/db/openrouter';
+import { formatAIResponse } from '@/db/openrouter';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -104,6 +104,92 @@ const BUILTIN_SCALE_QUESTIONS: Record<string, string[]> = {
     '兴趣保持：我仍然喜爱我平时喜爱的东西？',
   ],
 };
+
+type KnowledgeScaleRecord = {
+  scale_id: string;
+  title: string;
+  description?: string;
+  questions: string[];
+};
+
+function inferScaleId(title?: string, tags?: string[], contentScaleId?: string): string | null {
+  if (contentScaleId && BUILTIN_SCALE_QUESTIONS[contentScaleId]) return contentScaleId;
+  const candidates = [title || '', ...(tags || [])].join(' ');
+  if (/PHQ-?9/i.test(candidates)) return 'PHQ-9';
+  if (/HAMD-?17/i.test(candidates)) return 'HAMD-17';
+  if (/SDS-?20/i.test(candidates)) return 'SDS-20';
+  return null;
+}
+
+function parseKnowledgeScaleRecord(item: { title?: string; content?: string; tags?: string[] }): KnowledgeScaleRecord | null {
+  try {
+    const json = JSON.parse(item.content || '{}') as Partial<ScaleJson> & { description?: string; questions?: Array<{ text?: string; order?: number }> };
+    const scaleId = inferScaleId(item.title, item.tags, json.scale_id);
+    if (!scaleId) return null;
+    const questions = Array.isArray(json.questions)
+      ? json.questions
+          .slice()
+          .sort((a: any, b: any) => (a?.order ?? 0) - (b?.order ?? 0))
+          .map((q: any) => `${q?.text || ''}`.trim())
+          .filter(Boolean)
+      : [];
+    return {
+      scale_id: scaleId,
+      title: item.title || scaleId,
+      description: `${json.description || ''}`.trim() || SCALES.find(s => s.id === scaleId)?.description,
+      questions,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function buildQuestionBankFromKnowledge(
+  selectedScaleIds: string[],
+  knowledgeItems: Array<{ title?: string; content?: string; tags?: string[] }>
+): string[] {
+  const parsed = knowledgeItems
+    .map(parseKnowledgeScaleRecord)
+    .filter(Boolean) as KnowledgeScaleRecord[];
+
+  return selectedScaleIds.flatMap((scaleId) => {
+    const builtin = BUILTIN_SCALE_QUESTIONS[scaleId] ?? [];
+    const candidate = parsed
+      .filter((item) => item.scale_id === scaleId)
+      .sort((a, b) => b.questions.length - a.questions.length)[0];
+
+    if (candidate && candidate.questions.length >= builtin.length && builtin.length > 0) {
+      return candidate.questions.slice(0, builtin.length);
+    }
+    if (candidate && candidate.questions.length > 0 && builtin.length === 0) {
+      return candidate.questions;
+    }
+    return builtin;
+  });
+}
+
+function buildKnowledgePromptSummary(
+  selectedScaleIds: string[],
+  knowledgeItems: Array<{ title?: string; content?: string; tags?: string[] }>
+): string {
+  const parsed = knowledgeItems
+    .map(parseKnowledgeScaleRecord)
+    .filter(Boolean) as KnowledgeScaleRecord[];
+
+  return selectedScaleIds
+    .map((scaleId) => {
+      const builtin = BUILTIN_SCALE_QUESTIONS[scaleId] ?? [];
+      const candidate = parsed
+        .filter((item) => item.scale_id === scaleId)
+        .sort((a, b) => b.questions.length - a.questions.length)[0];
+      const questionCount = candidate && candidate.questions.length >= builtin.length && builtin.length > 0
+        ? candidate.questions.length
+        : builtin.length;
+      const description = candidate?.description || SCALES.find((item) => item.id === scaleId)?.description || '心理评估量表';
+      return `${scaleId}：${description}，共${questionCount}题，逐题自然提问，不要输出任何JSON、配置对象、标题标签或代码块。`;
+    })
+    .join('\n');
+}
 
 // 预设头像选项 (与 ProfilePageRedesigned 保持一致)
 const PRESET_AVATARS = [
@@ -405,7 +491,7 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
   const prefixRef = useRef('');
   const finalTranscriptRef = useRef('');
   // ── KB 模块级缓存：避免每次发送都发起 Supabase 网络请求 ────
-  const kbCacheRef = useRef<{ text: string; loaded: boolean }>({ text: '', loaded: false });
+  const kbCacheRef = useRef<{ items: any[]; loaded: boolean }>({ items: [], loaded: false });
 
   // ── 持久化：组件挂载时检测未完成会话 ──────────────────────
   useEffect(() => {
@@ -419,9 +505,7 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
   useEffect(() => {
     if (kbCacheRef.current.loaded) return;
     getKnowledgeBase('assessment').then(kb => {
-      kbCacheRef.current.text = (kb || []).slice(0, 3)
-        .map(k => `【${k.title}】${(k.content || '').slice(0, 200)}`)
-        .join('\n');
+      kbCacheRef.current.items = kb || [];
       kbCacheRef.current.loaded = true;
     }).catch(() => {
       kbCacheRef.current.loaded = true; // 失败也标记为已尝试，后续不再重试
@@ -528,35 +612,32 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
     }
   };
 
-  // 智能生成最后的保底回复
-  const generateSmartFallback = (userResponse: string, nextQuestion: string): string => {
+  // 量表阶段使用稳定、简洁的追问风格，避免生成式文案过于夸张
+  const buildAssessmentReply = (userResponse: string, nextQuestion: string, nextQuestionNumber: number): string => {
     const response = userResponse.toLowerCase();
-    let empathyPrefix = '';
-    
-    // 根据用户回答内容智能匹配共情回应
+    let prefix = '';
+
     if (response.includes('经常') || response.includes('总是') || response.includes('每天')) {
-      empathyPrefix = '听起来你最近承受着不小的压力 💔，这种持续性的状态确实需要关注，你愿意说出来真的很勇敢。';
+      prefix = '我记下了，这种情况出现得比较频繁。';
     } else if (response.includes('偶尔') || response.includes('有时') || response.includes('不太')) {
-      empathyPrefix = '看得出来这种情况是间歇性的 🌤️，你能够觉察到这一点很好，这份自我觉察很重要。';
+      prefix = '我记下了，这种情况是间歇出现的。';
     } else if (response.includes('没有') || response.includes('不会') || response.includes('很少')) {
-      empathyPrefix = '这方面你保持得不错 💪，继续保持这样的状态，这是很积极的信号。';
+      prefix = '我记下了，目前这方面影响相对较轻。';
     } else if (response.includes('不确定') || response.includes('不知道')) {
-      empathyPrefix = '这个问题可能需要仔细回想，没关系，我们慢慢来 😘，不用着急。';
+      prefix = '没关系，按最近两周的大致感受回答就可以。';
     } else if (response.includes('失眠') || response.includes('睡不着')) {
-      empathyPrefix = '睡眠问题确实会影响日常生活 😴，这需要我们特别关注，你不是一个人在面对这些。';
+      prefix = '我记下了，睡眠方面的变化需要重点关注。';
     } else if (response.includes('压力') || response.includes('焦虑')) {
-      empathyPrefix = '能够觉察到压力和焦虑是很重要的第一步 💦，我们一起来了解你的状态。';
+      prefix = '我记下了，你刚才提到了压力和焦虑。';
     } else if (response.includes('难过') || response.includes('伤心') || response.includes('沮丧')) {
-      empathyPrefix = '你的感受我能理解 💔，允许自己有这样的情绪是正常的，感谢你愿意告诉我。';
+      prefix = '我记下了，这类情绪体验值得继续了解。';
     } else if (response.length > 20) {
-      // 用户回答较长，说明愿意分享
-      empathyPrefix = '感谢你愿意分享这些细节 💖，这对评估很有帮助，你做得很好。';
+      prefix = '我记下了你刚才提到的情况。';
     } else {
-      // 其他情况
-      empathyPrefix = '谢谢你的回答 🥰，我们继续慢慢了解你的状态。';
+      prefix = '我记下了。';
     }
-    
-    return `${empathyPrefix} 下面我们继续：${nextQuestion}`;
+
+    return `${prefix} 下面继续第${nextQuestionNumber}题：${nextQuestion}`;
   };
 
   // 处理表情选择
@@ -583,71 +664,30 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
     setLoading(true);
 
     try {
-      // ── nextQ 取题：优先命中已缓存的 questionBank ──────────
-      let nextQ: string;
-      if (questionBank.length > 0) {
-        nextQ = getQuestionAt(currentQuestionIndex, questionBank, selectedScales);
-      } else {
-        // questionBank 尚未缓存，临时从 KB 同步（仅首次触发）
-        try {
-          const kb = await getKnowledgeBase('assessment');
-          const scales = kb.map(k => {
-            try { return { ...JSON.parse(k.content || '{}'), _title: k.title, _tags: (k.tags || []) as string[] }; }
-            catch { return null; }
-          }).filter(Boolean) as any[];
-          const matched = scales.filter(s =>
-            selectedScales.includes(s.scale_id) ||
-            selectedScales.some((id: string) => (s._tags as string[]).includes(id)) ||
-            selectedScales.some((id: string) => s._title?.includes(id))
-          );
-          const allQs = matched.flatMap((s: any) =>
-            (s.questions || []).slice().sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)).map((q: any) => q.text as string)
-          );
-          if (allQs.length > 0) {
-            setQuestionBank(allQs);
-            nextQ = ensureQuestionMark(allQs[currentQuestionIndex] ?? allQs[allQs.length - 1] ?? '');
-          } else {
-            nextQ = getQuestionAt(currentQuestionIndex, [], selectedScales);
+      const nextQuestionIndex = currentQuestionIndex + 1;
+      const hasNextQuestion = nextQuestionIndex < totalQuestions;
+      let aiContent = '我记下了，量表问题已经完成，正在为你生成评估结果。';
+
+      if (hasNextQuestion) {
+        let nextQ: string;
+        if (questionBank.length > 0) {
+          nextQ = getQuestionAt(nextQuestionIndex, questionBank, selectedScales);
+        } else {
+          try {
+            const kb = await getKnowledgeBase('assessment');
+            const allQs = buildQuestionBankFromKnowledge(selectedScales, kb);
+            if (allQs.length > 0) {
+              setQuestionBank(allQs);
+              nextQ = ensureQuestionMark(allQs[nextQuestionIndex] ?? allQs[allQs.length - 1] ?? '');
+            } else {
+              nextQ = getQuestionAt(nextQuestionIndex, [], selectedScales);
+            }
+          } catch {
+            nextQ = getQuestionAt(nextQuestionIndex, [], selectedScales);
           }
-        } catch {
-          nextQ = getQuestionAt(currentQuestionIndex, [], selectedScales);
         }
-      }
 
-      // ── 对话历史：最近2轮（4条）已足够上下文，减少token输入 ──
-      const conversationHistory = messages.slice(-4).map(m => ({
-        role: (m.role === 'assistant' ? 'assistant' : 'user') as 'user' | 'assistant',
-        content: m.content
-      }));
-
-      // ── 精简 systemPrompt：去除冗余示例，保留核心指令 ────────
-      const kbSnippet = kbCacheRef.current.text;
-      const systemPrompt = `你是温暖专业的心理咨询师，正在进行${selectedScales.join('、')}量表评估。
-
-回复要求（严格遵守）：
-1. 共情回应（20-40字）：针对用户具体回答，个性化反馈，加1-2个情绪emoji（💔💖😴💪🌤️🥰😘💦😳）
-2. 自然过渡到下一题：用"下面我们继续："或"接下来："引出 "${nextQ}"
-3. 禁止使用"好的/我理解了/我知道了/我能感受到"等空泛词
-4. 若用户提到具体时间/频率，必须在回复中体现${kbSnippet ? `\n\n参考：${kbSnippet}` : ''}`;
-
-      const aiResponse = await openRouterChatCompletion({
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...conversationHistory,
-          { role: 'user' as const, content: response }
-        ]
-      });
-
-      let aiContent = formatAIResponse(aiResponse?.text || '');
-
-      // ── 禁用词检测 & Fallback ────────────────────────────────
-      const isFallbackNeeded = !aiContent
-        || aiContent.length < 20
-        || /^(好的|我理解了|我知道了|我能感受到)/.test(aiContent);
-
-      if (isFallbackNeeded) {
-        // Fallback：直接用 generateSmartFallback，不再发起第二次 AI 调用（避免双倍延迟）
-        aiContent = formatAIResponse(generateSmartFallback(response, nextQ));
+        aiContent = formatAIResponse(buildAssessmentReply(response, nextQ, nextQuestionIndex + 1));
       }
 
       // 模拟问题进度增加
@@ -661,8 +701,10 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
         timestamp: new Date(),
         avatar: DOCTOR_AVATAR 
       };
+      let completedMessages: Message[] | null = null;
       setMessages(prev => {
         const newMessages = [...prev, aiMsg];
+        completedMessages = newMessages;
         // 触发打字机效果：新消息在末尾
         setTypingMsgIdx(newMessages.length - 1);
         setTypingText('');
@@ -692,7 +734,7 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
 
       // 如果完成所有题目
       if (currentQuestionIndex + 1 >= totalQuestions) {
-        handleComplete();
+        handleComplete(completedMessages ?? [...messages, userMsg, aiMsg]);
       }
 
     } catch (error) {
@@ -839,29 +881,11 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
     (async () => {
       try {
         const kb = await getKnowledgeBase('assessment');
-        const scales = kb.map(k => {
-          try { 
-            const json = JSON.parse(k.content || '{}');
-            return { ...json, _id: k.id, _title: k.title, _tags: k.tags || [] } as any;
-          } catch { return null }
-        }).filter(Boolean);
-        
-        if (scales.length > 0) {
-          // 匹配优先级：scale_id 精确匹配 → tags 包含匹配 → title 包含匹配
-          const selected = scales.filter(s =>
-            selectedScales.includes(s.scale_id) ||
-            selectedScales.some(id => (s._tags as string[]).includes(id)) ||
-            selectedScales.some(id => s._title?.includes(id))
-          );
-          const qs = selected.flatMap(s => (s.questions || [])
-            .slice()
-            .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-            .map((q: any) => q.text));
-          if (qs.length > 0) {
-            setQuestionBank(qs);
-            setTotalQuestions(qs.length);
-            return; // KB 加载成功，直接返回
-          }
+        const qs = buildQuestionBankFromKnowledge(selectedScales, kb);
+        if (qs.length > 0) {
+          setQuestionBank(qs);
+          setTotalQuestions(qs.length);
+          return; // KB 加载成功，直接返回
         }
         // KB 匹配失败或为空，使用内置题库兜底
         const builtinQs = selectedScales.flatMap(id => BUILTIN_SCALE_QUESTIONS[id] ?? []);
@@ -895,9 +919,11 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
     clearSession();
     setShowResumeBanner(false);
     setStarted(true);
+    setCurrentQuestionIndex(0);
+    const firstQuestion = getQuestionAt(0, questionBank, selectedScales);
     const greetingMsg: Message = {
       role: 'assistant',
-      content: ` 👋 Hi, 我是心域智护心理助手，接下来我们将进行 ${selectedScales.join(', ')} 评估。我会以温暖、共情的方式引导你逐步完成，每一步都会解释目的。我们开始吧？`,
+      content: `你好，我是心域智护心理助手。接下来我们会一起完成 ${selectedScales.join('、')} 评估，我会根据你的回答一步一步陪你完成。第1题：${firstQuestion}`,
       timestamp: new Date(),
       avatar: DOCTOR_AVATAR
     };
@@ -939,71 +965,30 @@ export default function ScaleStep({ onComplete, userId }: ScaleStepProps) {
     setLoading(true);
 
     try {
-      // ── nextQ 取题：优先命中已缓存的 questionBank ──────────
-      let nextQ: string;
-      if (questionBank.length > 0) {
-        nextQ = getQuestionAt(currentQuestionIndex, questionBank, selectedScales);
-      } else {
-        // questionBank 尚未缓存，临时从 KB 同步（仅首次触发）
-        try {
-          const kb = await getKnowledgeBase('assessment');
-          const scales = kb.map(k => {
-            try { return { ...JSON.parse(k.content || '{}'), _title: k.title, _tags: (k.tags || []) as string[] }; }
-            catch { return null; }
-          }).filter(Boolean) as any[];
-          const matched = scales.filter(s =>
-            selectedScales.includes(s.scale_id) ||
-            selectedScales.some((id: string) => (s._tags as string[]).includes(id)) ||
-            selectedScales.some((id: string) => s._title?.includes(id))
-          );
-          const allQs = matched.flatMap((s: any) =>
-            (s.questions || []).slice().sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)).map((q: any) => q.text as string)
-          );
-          if (allQs.length > 0) {
-            setQuestionBank(allQs);
-            nextQ = ensureQuestionMark(allQs[currentQuestionIndex] ?? allQs[allQs.length - 1] ?? '');
-          } else {
-            nextQ = getQuestionAt(currentQuestionIndex, [], selectedScales);
+      const nextQuestionIndex = currentQuestionIndex + 1;
+      const hasNextQuestion = nextQuestionIndex < totalQuestions;
+      let aiContent = '我记下了，量表问题已经完成，正在为你生成评估结果。';
+
+      if (hasNextQuestion) {
+        let nextQ: string;
+        if (questionBank.length > 0) {
+          nextQ = getQuestionAt(nextQuestionIndex, questionBank, selectedScales);
+        } else {
+          try {
+            const kb = await getKnowledgeBase('assessment');
+            const allQs = buildQuestionBankFromKnowledge(selectedScales, kb);
+            if (allQs.length > 0) {
+              setQuestionBank(allQs);
+              nextQ = ensureQuestionMark(allQs[nextQuestionIndex] ?? allQs[allQs.length - 1] ?? '');
+            } else {
+              nextQ = getQuestionAt(nextQuestionIndex, [], selectedScales);
+            }
+          } catch {
+            nextQ = getQuestionAt(nextQuestionIndex, [], selectedScales);
           }
-        } catch {
-          nextQ = getQuestionAt(currentQuestionIndex, [], selectedScales);
         }
-      }
 
-      // ── 对话历史：最近2轮（4条）已足够上下文，减少token输入 ──
-      const conversationHistory = messages.slice(-4).map(m => ({
-        role: (m.role === 'assistant' ? 'assistant' : 'user') as 'user' | 'assistant',
-        content: m.content
-      }));
-
-      // ── 精简 systemPrompt：去除冗余示例，保留核心指令 ────────
-      const kbSnippet = kbCacheRef.current.text;
-      const systemPrompt = `你是温暖专业的心理咨询师，正在进行${selectedScales.join('、')}量表评估。
-
-回复要求（严格遵守）：
-1. 共情回应（20-40字）：针对用户具体回答，个性化反馈，加1-2个情绪emoji（💔💖😴💪🌤️🥰😘💦😳）
-2. 自然过渡到下一题：用"下面我们继续："或"接下来："引出 "${nextQ}"
-3. 禁止使用"好的/我理解了/我知道了/我能感受到"等空泛词
-4. 若用户提到具体时间/频率，必须在回复中体现${kbSnippet ? `\n\n参考：${kbSnippet}` : ''}`;
-
-      const aiResponse = await openRouterChatCompletion({
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...conversationHistory,
-          { role: 'user' as const, content: inputText }
-        ]
-      });
-
-      let aiContent = formatAIResponse(aiResponse?.text || '');
-
-      // ── 禁用词检测 & Fallback ────────────────────────────────
-      const isFallbackNeeded = !aiContent
-        || aiContent.length < 20
-        || /^(好的|我理解了|我知道了|我能感受到)/.test(aiContent);
-
-      if (isFallbackNeeded) {
-        // Fallback：直接用 generateSmartFallback，不再发起第二次 AI 调用（避免双倍延迟）
-        aiContent = formatAIResponse(generateSmartFallback(inputText, nextQ));
+        aiContent = formatAIResponse(buildAssessmentReply(inputText, nextQ, nextQuestionIndex + 1));
       }
 
       // 模拟问题进度增加

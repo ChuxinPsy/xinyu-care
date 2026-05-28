@@ -8,6 +8,8 @@ dist-ssr/
 output/
 coverage/
 .pnpm-home/
+server/target/
+storage-data/
 *.tsbuildinfo
 
 # Lockfiles not used by this project (pnpm workspace)

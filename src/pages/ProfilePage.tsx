@@ -12,10 +12,12 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { updateProfile } from '@/db/api';
+import { resolveAvatarSource } from '@/lib/avatar-presets';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export default function ProfilePage() {
   const { user, profile, signOut, refreshProfile } = useAuth();
+  const avatarSource = resolveAvatarSource(profile?.avatar_url);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -85,9 +87,9 @@ export default function ProfilePage() {
         <div className="max-w-screen-xl mx-auto">
           <div className="flex items-center space-x-4">
             <Avatar className="w-20 h-20 border-4 border-primary-foreground/20">
-              <AvatarImage src={profile?.avatar_url} />
-              <AvatarFallback className="bg-primary-foreground/20 text-2xl">
-                {profile?.username?.charAt(0).toUpperCase()}
+              {avatarSource.imageUrl && <AvatarImage src={avatarSource.imageUrl} />}
+              <AvatarFallback className={avatarSource.preset?.bg ? `${avatarSource.preset.bg} text-2xl` : 'bg-primary-foreground/20 text-2xl'}>
+                {avatarSource.preset?.emoji || profile?.username?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">

@@ -35,12 +35,19 @@ export default function PersonalInfoPage() {
 
   useEffect(() => {
     if (profile) {
+      let bioData: Record<string, unknown> = {};
+      try {
+        bioData = profile.bio ? JSON.parse(profile.bio) : {};
+      } catch {
+        bioData = {};
+      }
+
       setFormData({
         full_name: profile.full_name || '',
         gender: (profile.gender as any) || 'other',
         age: profile.birth_date ? calculateAge(profile.birth_date).toString() : '',
-        height: '', // Assume these aren't in profile yet, or add to metadata
-        weight: '',
+        height: bioData.height ? String(bioData.height) : '',
+        weight: bioData.weight ? String(bioData.weight) : '',
         phone: profile.phone || '',
         wechat: profile.wechat || '',
         email: profile.email || ''
@@ -68,6 +75,29 @@ export default function PersonalInfoPage() {
         toast.error('请输入有效的身高 (50-250cm)');
         return;
       }
+
+      let birthDateToSave: string | null = null;
+      if (formData.age && !Number.isNaN(Number(formData.age)) && Number(formData.age) > 0) {
+        const birthYear = new Date().getFullYear() - Number(formData.age);
+        birthDateToSave = `${birthYear}-01-01`;
+      }
+
+      let bioData: Record<string, unknown> = {};
+      try {
+        bioData = profile?.bio ? JSON.parse(profile.bio) : {};
+      } catch {
+        bioData = {};
+      }
+      if (formData.height) {
+        bioData.height = Number(formData.height);
+      } else {
+        delete bioData.height;
+      }
+      if (formData.weight) {
+        bioData.weight = Number(formData.weight);
+      } else {
+        delete bioData.weight;
+      }
       
       await updateProfile(user.id, {
         full_name: formData.full_name,
@@ -75,7 +105,9 @@ export default function PersonalInfoPage() {
         phone: formData.phone,
         wechat: formData.wechat,
         email: formData.email,
-        // birth_date can be derived from age if needed, but for now we'll just save what we have
+        role: profile?.role || 'user',
+        birth_date: birthDateToSave || undefined,
+        bio: Object.keys(bioData).length > 0 ? JSON.stringify(bioData) : undefined,
       });
       
       await refreshProfile();

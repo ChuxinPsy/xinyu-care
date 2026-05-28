@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
@@ -220,6 +220,9 @@ export default function AlertsPage() {
         <DialogContent className="max-w-md w-[95vw] rounded-2xl p-4 md:p-6">
           <DialogHeader className="mb-4">
             <DialogTitle className="text-xl">处理预警</DialogTitle>
+            <DialogDescription className="sr-only">
+              为当前风险预警添加处理备注并确认已处理。
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-6">
             {selectedAlert && (

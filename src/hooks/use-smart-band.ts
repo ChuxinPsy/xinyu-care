@@ -49,6 +49,8 @@ export function useSmartBand({ userId, useMockData = true }: UseSmartBandOptions
   const gattServerRef = useRef<BluetoothRemoteGATTServer | null>(null);
   const dataIntervalRef = useRef<Timeout | null>(null);
   const mockDataIntervalRef = useRef<Timeout | null>(null);
+  const latestRealtimeDataRef = useRef<Partial<WearableData> | null>(null);
+  const hasPersistedCurrentSessionRef = useRef(false);
 
   // 清理函数
   const cleanup = useCallback(() => {
@@ -73,6 +75,10 @@ export function useSmartBand({ userId, useMockData = true }: UseSmartBandOptions
       cleanup();
     };
   }, [cleanup]);
+
+  useEffect(() => {
+    latestRealtimeDataRef.current = realtimeData;
+  }, [realtimeData]);
 
   // 扫描设备
   const scanDevices = useCallback(async () => {
@@ -160,6 +166,7 @@ export function useSmartBand({ userId, useMockData = true }: UseSmartBandOptions
         
         setConnectedDevice(device);
         setConnectionStatus('connected');
+        hasPersistedCurrentSessionRef.current = false;
         toast.success(`已连接到 ${device.name}`);
         
         // 启动模拟数据生成
@@ -203,6 +210,7 @@ export function useSmartBand({ userId, useMockData = true }: UseSmartBandOptions
         
         setConnectedDevice(device);
         setConnectionStatus('connected');
+        hasPersistedCurrentSessionRef.current = false;
         toast.success(`已连接到 ${device.name}`);
         
         // 监听断开连接
@@ -229,6 +237,8 @@ export function useSmartBand({ userId, useMockData = true }: UseSmartBandOptions
     setConnectedDevice(null);
     setConnectionStatus('disconnected');
     setRealtimeData(null);
+    latestRealtimeDataRef.current = null;
+    hasPersistedCurrentSessionRef.current = false;
     toast.info('已断开连接');
   }, [cleanup]);
 
@@ -245,16 +255,32 @@ export function useSmartBand({ userId, useMockData = true }: UseSmartBandOptions
     }
   }, [userId, realtimeData]);
 
+  // 建立连接后尽快保存一次，确保当天记录能及时落库
+  useEffect(() => {
+    if (connectionStatus !== 'connected' || !userId || !realtimeData || hasPersistedCurrentSessionRef.current) {
+      return;
+    }
+
+    hasPersistedCurrentSessionRef.current = true;
+    upsertWearableData(realtimeData).catch(console.error);
+  }, [connectionStatus, realtimeData, userId]);
+
   // 定期保存实时数据到数据库
   useEffect(() => {
-    if (connectionStatus === 'connected' && realtimeData && userId) {
+    if (connectionStatus === 'connected' && userId) {
+      const persistLatest = () => {
+        const latestData = latestRealtimeDataRef.current;
+        if (!latestData) return;
+        upsertWearableData(latestData).catch(console.error);
+      };
+
       const interval = setInterval(() => {
-        upsertWearableData(realtimeData).catch(console.error);
+        persistLatest();
       }, 60000); // 每分钟保存一次
       
       return () => clearInterval(interval);
     }
-  }, [connectionStatus, realtimeData, userId]);
+  }, [connectionStatus, userId]);
 
   return {
     connectionStatus,

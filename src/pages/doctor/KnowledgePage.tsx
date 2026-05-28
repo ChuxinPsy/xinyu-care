@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -386,6 +386,9 @@ export default function KnowledgePage() {
           <DialogContent className="max-w-2xl w-[95vw] md:w-full max-h-[90vh] overflow-y-auto p-4 md:p-6 rounded-2xl">
             <DialogHeader className="mb-4">
               <DialogTitle className="text-xl">{editingItem ? '编辑知识' : '添加知识'}</DialogTitle>
+              <DialogDescription className="sr-only">
+                维护评估量表、治疗方法和研究资料内容。
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-5">
               <div className="space-y-2">
@@ -735,6 +738,9 @@ export default function KnowledgePage() {
           <DialogContent className="max-w-lg w-[95vw] rounded-2xl">
             <DialogHeader>
               <DialogTitle className="text-lg font-bold">{viewingQuestions.title} - 题目详情</DialogTitle>
+              <DialogDescription className="sr-only">
+                查看当前量表知识条目的全部题目内容。
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
               {viewingQuestions.questions.length === 0 ? (

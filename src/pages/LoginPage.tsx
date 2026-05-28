@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { getProfile, useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/db/supabase';
+import { getAuthState } from '@/lib/backend-auth';
 import { validateUsername, sanitizeUsername } from '@/utils/validation';
 
 export default function LoginPage() {
@@ -49,9 +49,9 @@ export default function LoginPage() {
     } else {
       // 根据数据库中的实际角色进行跳转
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { session } = await getAuthState();
         let userRole: 'user' | 'doctor' | 'admin' | undefined = undefined;
-        if (session?.user) {
+        if (session?.user?.id) {
           const p = await getProfile(session.user.id);
           userRole = p?.role;
         }
@@ -162,6 +162,7 @@ export default function LoginPage() {
                   <Input
                     id="login-username"
                     type="text"
+                    autoComplete="username"
                     placeholder={role === 'doctor' ? '请输入医生账号用户名' : '请输入用户名'}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -173,6 +174,7 @@ export default function LoginPage() {
                   <Input
                     id="login-password"
                     type="password"
+                    autoComplete="current-password"
                     placeholder={role === 'doctor' ? '医生端至少6位密码' : '请输入密码'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -192,6 +194,7 @@ export default function LoginPage() {
                   <Input
                     id="signup-username"
                     type="text"
+                    autoComplete="username"
                     placeholder="支持中文、英文、数字（2-20个字符）"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -207,6 +210,7 @@ export default function LoginPage() {
                   <Input
                     id="signup-password"
                     type="password"
+                    autoComplete="new-password"
                     placeholder="至少6个字符"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

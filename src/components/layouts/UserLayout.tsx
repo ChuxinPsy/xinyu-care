@@ -5,6 +5,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { resolveAvatarSource } from '@/lib/avatar-presets';
 
 interface UserLayoutProps {
   children: React.ReactNode;
@@ -22,6 +23,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user, profile } = useAuth();
+  const avatarSource = resolveAvatarSource(profile?.avatar_url);
 
   const handleLogoClick = () => {
     // 跳转到官网首页
@@ -102,9 +104,9 @@ export default function UserLayout({ children }: UserLayoutProps) {
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-muted hover:bg-muted/80 text-foreground text-sm font-medium border border-border transition-all"
               >
                 <Avatar className="w-8 h-8 border-2 border-border">
-                  <AvatarImage src={profile?.avatar_url || ''} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                    {profile?.full_name?.charAt(0) || profile?.username?.charAt(0) || 'U'}
+                  {avatarSource.imageUrl && <AvatarImage src={avatarSource.imageUrl} />}
+                  <AvatarFallback className={cn("text-primary text-xs", avatarSource.preset?.bg ?? "bg-primary/10")}>
+                    {avatarSource.preset?.emoji || profile?.full_name?.charAt(0) || profile?.username?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <span className="truncate">{profile?.full_name || profile?.username || '用户登录'}</span>

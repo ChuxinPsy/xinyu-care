@@ -1,5 +1,3 @@
-// Supabase API封装
-
 import type {
   Assessment,
   ChatMessage,
@@ -15,7 +13,20 @@ import type {
   UserHealingRecord,
   WearableData,
 } from '@/types';
-import { supabase } from './supabase';
+import {
+  callRpc,
+  deleteRows,
+  deleteStorageFiles,
+  insertRow,
+  invokeFunction,
+  publicStorageUrl,
+  selectMaybeSingle,
+  selectRows,
+  updateRow,
+  uploadStorageFile,
+  type FilterCondition,
+  type OrderCondition,
+} from '@/lib/backend-api';
 
 const assessmentFingerprint = (assessment: any) => {
   if (assessment.assessment_type !== 'fusion_report') return assessment.id;
@@ -42,405 +53,230 @@ const dedupeAssessments = <T extends any[]>(assessments: T): T => {
   }) as T;
 };
 
-// ==================== 用户档案 ====================
-export const getProfile = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as Profile | null;
-};
+const eq = (field: string, value: unknown): FilterCondition => ({ op: 'eq', field, value });
+const gte = (field: string, value: unknown): FilterCondition => ({ op: 'gte', field, value });
+const lte = (field: string, value: unknown): FilterCondition => ({ op: 'lte', field, value });
+const desc = (field: string): OrderCondition => ({ field, ascending: false });
+const asc = (field: string): OrderCondition => ({ field, ascending: true });
 
-export const updateProfile = async (userId: string, updates: Partial<Profile>) => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .update(updates)
-    .eq('id', userId)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as Profile;
-};
+const normalizeCode = (code: string) =>
+  code
+    .trim()
+    .replace(/[\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A]/g, (ch) =>
+      String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
+    );
+
+async function listRows<T>(
+  table: string,
+  options: {
+    filters?: FilterCondition[];
+    orders?: OrderCondition[];
+    limit?: number;
+    count?: boolean;
+    head?: boolean;
+  } = {}
+) {
+  const envelope = await selectRows<T>(table, options);
+  return {
+    rows: Array.isArray(envelope.data) ? envelope.data : [],
+    count: envelope.count || 0,
+  };
+}
+
+// 用户档案
+export const getProfile = async (userId: string) =>
+  selectMaybeSingle<Profile>('profiles', { filters: [eq('id', userId)] });
+
+export const updateProfile = async (userId: string, updates: Partial<Profile>) =>
+  updateRow<Profile>('profiles', updates as Record<string, unknown>, [eq('id', userId)]);
 
 export const getAllProfiles = async () => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<Profile>('profiles', { orders: [desc('created_at')] });
+  return rows;
 };
 
-// ==================== 情绪日记 ====================
+// 情绪日记
 export const getEmotionDiaries = async (userId: string, limit = 30) => {
-  const { data, error } = await supabase
-    .from('emotion_diaries')
-    .select('*')
-    .eq('user_id', userId)
-    .order('diary_date', { ascending: false })
-    .limit(limit);
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<EmotionDiary>('emotion_diaries', {
+    filters: [eq('user_id', userId)],
+    orders: [desc('diary_date')],
+    limit,
+  });
+  return rows;
 };
 
-export const getEmotionDiaryByDate = async (userId: string, date: string) => {
-  const { data, error } = await supabase
-    .from('emotion_diaries')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('diary_date', date)
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as EmotionDiary | null;
-};
+export const getEmotionDiaryByDate = async (userId: string, date: string) =>
+  selectMaybeSingle<EmotionDiary>('emotion_diaries', {
+    filters: [eq('user_id', userId), eq('diary_date', date)],
+  });
 
-export const createEmotionDiary = async (diary: Partial<EmotionDiary>) => {
-  const { data, error } = await supabase
-    .from('emotion_diaries')
-    .upsert(diary, { onConflict: 'user_id,diary_date' })
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as EmotionDiary;
-};
+export const createEmotionDiary = async (diary: Partial<EmotionDiary>) =>
+  insertRow<EmotionDiary>('emotion_diaries', diary as Record<string, unknown>, {
+    upsert: true,
+    onConflict: 'user_id,diary_date',
+  });
 
-export const updateEmotionDiary = async (id: string, updates: Partial<EmotionDiary>) => {
-  const { data, error } = await supabase
-    .from('emotion_diaries')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as EmotionDiary;
-};
+export const updateEmotionDiary = async (id: string, updates: Partial<EmotionDiary>) =>
+  updateRow<EmotionDiary>('emotion_diaries', updates as Record<string, unknown>, [eq('id', id)]);
 
 export const deleteEmotionDiary = async (id: string) => {
-  const { error } = await supabase
-    .from('emotion_diaries')
-    .delete()
-    .eq('id', id);
-  
-  if (error) throw error;
+  await deleteRows('emotion_diaries', [eq('id', id)]);
 };
 
-// ==================== 评估记录 ====================
+// 评估记录
 export const getAssessments = async (userId: string, limit = 10) => {
-  const { data, error } = await supabase
-    .from('assessments')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  
-  if (error) throw error;
-  return Array.isArray(data) ? dedupeAssessments(data).slice(0, limit) : [];
+  const { rows } = await listRows<Assessment>('assessments', {
+    filters: [eq('user_id', userId)],
+    orders: [desc('created_at')],
+    limit,
+  });
+  return dedupeAssessments(rows).slice(0, limit);
 };
 
 export const getAllAssessments = async (limit = 1000) => {
-  const { data, error } = await supabase
-    .from('assessments')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(limit);
-
-  if (error) throw error;
-  return Array.isArray(data) ? dedupeAssessments(data).slice(0, limit) : [];
+  const { rows } = await listRows<Assessment>('assessments', { orders: [desc('created_at')], limit });
+  return dedupeAssessments(rows).slice(0, limit);
 };
 
 export const getAllEmotionDiaries = async (limit = 1000) => {
-  const { data, error } = await supabase
-    .from('emotion_diaries')
-    .select('*')
-    .order('diary_date', { ascending: false })
-    .limit(limit);
-
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<EmotionDiary>('emotion_diaries', {
+    orders: [desc('diary_date')],
+    limit,
+  });
+  return rows;
 };
 
-export const getAssessmentById = async (id: string) => {
-  const { data, error } = await supabase
-    .from('assessments')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as Assessment | null;
-};
+export const getAssessmentById = async (id: string) =>
+  selectMaybeSingle<Assessment>('assessments', { filters: [eq('id', id)] });
 
-export const createAssessment = async (assessment: Partial<Assessment>) => {
-  const { data, error } = await supabase
-    .from('assessments')
-    .insert(assessment)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as Assessment;
-};
+export const createAssessment = async (assessment: Partial<Assessment>) =>
+  insertRow<Assessment>('assessments', assessment as Record<string, unknown>);
 
-export const updateAssessment = async (id: string, updates: Partial<Assessment>) => {
-  const { data, error } = await supabase
-    .from('assessments')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as Assessment;
-};
+export const updateAssessment = async (id: string, updates: Partial<Assessment>) =>
+  updateRow<Assessment>('assessments', updates as Record<string, unknown>, [eq('id', id)]);
 
-// ==================== 手环数据 ====================
+// 手环数据
 export const getWearableData = async (userId: string, limit = 30) => {
-  const { data, error } = await supabase
-    .from('wearable_data')
-    .select('*')
-    .eq('user_id', userId)
-    .order('record_date', { ascending: false })
-    .limit(limit);
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<WearableData>('wearable_data', {
+    filters: [eq('user_id', userId)],
+    orders: [desc('record_date')],
+    limit,
+  });
+  return rows;
 };
 
-export const getWearableDataByDateRange = async (
-  userId: string,
-  startDate: string,
-  endDate: string
-) => {
-  const { data, error } = await supabase
-    .from('wearable_data')
-    .select('*')
-    .eq('user_id', userId)
-    .gte('record_date', startDate)
-    .lte('record_date', endDate)
-    .order('record_date', { ascending: true });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+export const getWearableDataByDateRange = async (userId: string, startDate: string, endDate: string) => {
+  const { rows } = await listRows<WearableData>('wearable_data', {
+    filters: [eq('user_id', userId), gte('record_date', startDate), lte('record_date', endDate)],
+    orders: [asc('record_date')],
+  });
+  return rows;
 };
 
-export const getLatestWearableData = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('wearable_data')
-    .select('*')
-    .eq('user_id', userId)
-    .order('record_date', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as WearableData | null;
-};
+export const getLatestWearableData = async (userId: string) =>
+  selectMaybeSingle<WearableData>('wearable_data', {
+    filters: [eq('user_id', userId)],
+    orders: [desc('record_date')],
+  });
 
-export const createWearableData = async (wearableData: Partial<WearableData>) => {
-  const { data, error } = await supabase
-    .from('wearable_data')
-    .insert(wearableData)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as WearableData;
-};
+export const createWearableData = async (wearableData: Partial<WearableData>) =>
+  insertRow<WearableData>('wearable_data', wearableData as Record<string, unknown>);
 
-export const updateWearableData = async (
-  id: string,
-  updates: Partial<WearableData>
-) => {
-  const { data, error } = await supabase
-    .from('wearable_data')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as WearableData;
-};
+export const updateWearableData = async (id: string, updates: Partial<WearableData>) =>
+  updateRow<WearableData>('wearable_data', updates as Record<string, unknown>, [eq('id', id)]);
 
-export const upsertWearableData = async (wearableData: Partial<WearableData>) => {
-  const { data, error } = await supabase
-    .from('wearable_data')
-    .upsert(wearableData, { onConflict: 'user_id,record_date' })
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as WearableData;
-};
+export const upsertWearableData = async (wearableData: Partial<WearableData>) =>
+  insertRow<WearableData>('wearable_data', wearableData as Record<string, unknown>, {
+    upsert: true,
+    onConflict: 'user_id,record_date',
+  });
 
-// ==================== 疗愈内容 ====================
+// 疗愈内容
 export const getHealingContents = async (category?: string) => {
-  let query = supabase
-    .from('healing_contents')
-    .select('*')
-    .eq('is_active', true);
-  
-  if (category) {
-    query = query.eq('category', category);
-  }
-  
-  const { data, error } = await query.order('created_at', { ascending: false });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const filters = [eq('is_active', true)];
+  if (category) filters.push(eq('category', category));
+  const { rows } = await listRows<HealingContent>('healing_contents', {
+    filters,
+    orders: [desc('created_at')],
+  });
+  return rows;
 };
 
-export const createHealingRecord = async (record: Partial<UserHealingRecord>) => {
-  const { data, error } = await supabase
-    .from('user_healing_records')
-    .insert(record)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as UserHealingRecord;
-};
+export const createHealingRecord = async (record: Partial<UserHealingRecord>) =>
+  insertRow<UserHealingRecord>('user_healing_records', record as Record<string, unknown>);
 
 export const getHealingRecords = async (userId: string, limit = 20) => {
-  const { data, error } = await supabase
-    .from('user_healing_records')
-    .select('*, healing_contents(*)')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<UserHealingRecord>('user_healing_records', {
+    filters: [eq('user_id', userId)],
+    orders: [desc('created_at')],
+    limit,
+  });
+  return rows;
 };
 
-// ==================== 树洞 ====================
+// 社区
 export const getCommunityPosts = async (limit = 20) => {
-  const { data, error } = await supabase
-    .from('community_posts')
-    .select('*')
-    .eq('is_hidden', false)
-    .order('is_pinned', { ascending: false })
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<CommunityPost>('community_posts', {
+    filters: [eq('is_hidden', false)],
+    orders: [desc('is_pinned'), desc('created_at')],
+    limit,
+  });
+  return rows;
 };
 
 export const createCommunityPost = async (post: Partial<CommunityPost>) => {
-  // Ensure required anonymous_name is present
   const payload = {
     ...post,
     anonymous_name: post.anonymous_name || post.anonymous_nickname || '匿名用户',
   };
-  const { data, error } = await supabase
-    .from('community_posts')
-    .insert(payload)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as CommunityPost;
+  return insertRow<CommunityPost>('community_posts', payload as Record<string, unknown>);
 };
 
 export const getCommunityComments = async (postId: string) => {
-  const { data, error } = await supabase
-    .from('community_comments')
-    .select('*')
-    .eq('post_id', postId)
-    .order('created_at', { ascending: true });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<CommunityComment>('community_comments', {
+    filters: [eq('post_id', postId)],
+    orders: [asc('created_at')],
+  });
+  return rows;
 };
 
 export const getCommunityPostCommentCount = async (postId: string) => {
-  const { count, error } = await supabase
-    .from('community_comments')
-    .select('*', { count: 'exact', head: true })
-    .eq('post_id', postId);
-  
-  if (error) throw error;
-  return count || 0;
+  const { count } = await listRows<CommunityComment>('community_comments', {
+    filters: [eq('post_id', postId)],
+    head: true,
+    count: true,
+  });
+  return count;
 };
 
-export const createCommunityComment = async (comment: Partial<CommunityComment>) => {
-  const { data, error } = await supabase
-    .from('community_comments')
-    .insert(comment)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as CommunityComment;
-};
+export const createCommunityComment = async (comment: Partial<CommunityComment>) =>
+  insertRow<CommunityComment>('community_comments', comment as Record<string, unknown>);
 
 export const deleteCommunityPost = async (postId: string, userId: string) => {
-  // 先检查是否是该用户的帖子
-  const { data: post } = await supabase
-    .from('community_posts')
-    .select('user_id')
-    .eq('id', postId)
-    .maybeSingle();
-  
+  const post = await selectMaybeSingle<CommunityPost>('community_posts', { filters: [eq('id', postId)] });
   if (!post || post.user_id !== userId) {
     throw new Error('无权删除此帖子');
   }
-  
-  const { error } = await supabase
-    .from('community_posts')
-    .delete()
-    .eq('id', postId);
-  
-  if (error) throw error;
+  await deleteRows('community_posts', [eq('id', postId)]);
 };
 
 export const deleteHealingContent = async (contentId: string) => {
-  const { error } = await supabase
-    .from('healing_contents')
-    .delete()
-    .eq('id', contentId);
-  
-  if (error) throw error;
+  await deleteRows('healing_contents', [eq('id', contentId)]);
 };
 
 export const togglePostLike = async (postId: string, userId: string) => {
-  // 检查是否已点赞
-  const { data: existing } = await supabase
-    .from('post_likes')
-    .select('id')
-    .eq('post_id', postId)
-    .eq('user_id', userId)
-    .maybeSingle();
-  
+  const existing = await selectMaybeSingle<{ id: string }>('post_likes', {
+    filters: [eq('post_id', postId), eq('user_id', userId)],
+  });
   if (existing) {
-    // 取消点赞
-    const { error } = await supabase
-      .from('post_likes')
-      .delete()
-      .eq('id', existing.id);
-    if (error) throw error;
+    await deleteRows('post_likes', [eq('id', existing.id)]);
     return false;
-  } else {
-    // 添加点赞
-    const { error } = await supabase
-      .from('post_likes')
-      .insert({ post_id: postId, user_id: userId });
-    if (error) throw error;
-    return true;
   }
+  await insertRow('post_likes', { post_id: postId, user_id: userId });
+  return true;
 };
 
-// ==================== 冥想记录 ====================
+// 冥想记录
 export const createMeditationSession = async (session: {
   user_id: string;
   content_id: string;
@@ -449,82 +285,24 @@ export const createMeditationSession = async (session: {
   mood_before?: string;
   mood_after?: string;
   notes?: string;
-}) => {
-  const { data, error } = await supabase
-    .from('meditation_sessions')
-    .insert(session)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data;
-};
+}) => insertRow('meditation_sessions', session);
 
-// ==================== 融合报告相关 ====================
+// 融合报告
 export const syncReport = async (reportData: {
   user_id: string;
   assessment_id?: string;
   score: number;
-  risk_level: number; // 0-100 mapped to risk level
+  risk_level: number;
   conversation_history?: any[];
   report_details: any;
   weights: { scale: number; voice: number; expression: number };
 }) => {
-  // 1. 如果有assessment_id，更新assessment
   let assessmentId = reportData.assessment_id;
-  const conversationHistory = reportData.conversation_history ?? reportData.report_details?.scaleData?.conversationHistory ?? [];
-  
+  const conversationHistory =
+    reportData.conversation_history ?? reportData.report_details?.scaleData?.conversationHistory ?? [];
+
   if (assessmentId) {
     await updateAssessment(assessmentId, {
-      score: reportData.score,
-      risk_level: reportData.risk_level, // 这里的risk_level如果是0-10，需要转换
-      conversation_history: conversationHistory,
-      report: {
-        ...reportData.report_details,
-        weights: reportData.weights,
-        synced_at: new Date().toISOString(),
-      },
-    });
-  } else {
-    const lowerBound = new Date(Date.now() - 2 * 60 * 1000).toISOString();
-    const { data: recent, error: recentError } = await supabase
-      .from('assessments')
-      .select('id,report')
-      .eq('user_id', reportData.user_id)
-      .eq('assessment_type', 'fusion_report')
-      .gte('created_at', lowerBound)
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    if (recentError) throw recentError;
-
-    const duplicate = (recent || []).find((item: any) => {
-      const report = item.report || {};
-      return (
-        report.scaleData?.score === reportData.report_details?.scaleData?.score &&
-        report.voiceData?.score === reportData.report_details?.voiceData?.score &&
-        report.expressionData?.depression_risk_score === reportData.report_details?.expressionData?.depression_risk_score
-      );
-    });
-
-    if (duplicate) {
-      await updateAssessment(duplicate.id, {
-        score: reportData.score,
-        risk_level: reportData.risk_level,
-        conversation_history: conversationHistory,
-        report: {
-          ...reportData.report_details,
-          weights: reportData.weights,
-          synced_at: new Date().toISOString(),
-        },
-      });
-      return duplicate.id;
-    }
-
-    // 否则创建新的assessment
-    const newAssessment = await createAssessment({
-      user_id: reportData.user_id,
-      assessment_type: 'fusion_report',
       score: reportData.score,
       risk_level: reportData.risk_level,
       conversation_history: conversationHistory,
@@ -534,346 +312,238 @@ export const syncReport = async (reportData: {
         synced_at: new Date().toISOString(),
       },
     });
-    assessmentId = newAssessment?.id;
+    return assessmentId;
   }
 
-  // 2. 写入报告中心 (这里假设报告中心就是assessments表，或者是另一张表)
-  // 如果有专门的 report_center 表，可以在这里写入。
-  // 目前沿用 assessments 表作为历史记录。
+  const lowerBound = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+  const { rows: recent } = await listRows<Assessment>('assessments', {
+    filters: [
+      eq('user_id', reportData.user_id),
+      eq('assessment_type', 'fusion_report'),
+      gte('created_at', lowerBound),
+    ],
+    orders: [desc('created_at')],
+    limit: 5,
+  });
 
-  return assessmentId;
+  const duplicate = recent.find((item: any) => {
+    const report = item.report || {};
+    return (
+      report.scaleData?.score === reportData.report_details?.scaleData?.score &&
+      report.voiceData?.score === reportData.report_details?.voiceData?.score &&
+      report.expressionData?.depression_risk_score === reportData.report_details?.expressionData?.depression_risk_score
+    );
+  });
+
+  if (duplicate) {
+    await updateAssessment(duplicate.id, {
+      score: reportData.score,
+      risk_level: reportData.risk_level,
+      conversation_history: conversationHistory,
+      report: {
+        ...reportData.report_details,
+        weights: reportData.weights,
+        synced_at: new Date().toISOString(),
+      },
+    });
+    return duplicate.id;
+  }
+
+  const created = await createAssessment({
+    user_id: reportData.user_id,
+    assessment_type: 'fusion_report',
+    score: reportData.score,
+    risk_level: reportData.risk_level,
+    conversation_history: conversationHistory,
+    report: {
+      ...reportData.report_details,
+      weights: reportData.weights,
+      synced_at: new Date().toISOString(),
+    },
+  });
+  return created?.id;
 };
 
 export const getReportHistory = async (userId: string, filters?: any) => {
-  let query = supabase
-    .from('assessments')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (filters) {
-    if (filters.startDate && filters.endDate) {
-      query = query.gte('created_at', filters.startDate).lte('created_at', filters.endDate);
-    }
-    if (filters.riskLevel) {
-      // 假设 risk_level 存的是 0-10 或 0-100
-      // 需要根据具体存储逻辑过滤
-    }
+  const queryFilters = [eq('user_id', userId)];
+  if (filters?.startDate && filters?.endDate) {
+    queryFilters.push(gte('created_at', filters.startDate), lte('created_at', filters.endDate));
   }
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
+  const { rows } = await listRows<Assessment>('assessments', {
+    filters: queryFilters,
+    orders: [desc('created_at')],
+  });
+  return rows;
 };
 
 export const getMeditationSessions = async (userId: string, limit = 50) => {
-  const { data, error } = await supabase
-    .from('meditation_sessions')
-    .select('*, healing_contents(*)')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<any>('meditation_sessions', {
+    filters: [eq('user_id', userId)],
+    orders: [desc('created_at')],
+    limit,
+  });
+  return rows;
 };
 
 export const getMeditationStats = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('meditation_sessions')
-    .select('duration, completed')
-    .eq('user_id', userId)
-    .eq('completed', true);
-  
-  if (error) throw error;
-  
-  const sessions = Array.isArray(data) ? data : [];
-  const totalMinutes = sessions.reduce((sum, s) => sum + Math.floor(s.duration / 60), 0);
-  const totalSessions = sessions.length;
-  
-  return { totalMinutes, totalSessions };
+  const { rows } = await listRows<{ duration: number; completed: boolean }>('meditation_sessions', {
+    filters: [eq('user_id', userId), eq('completed', true)],
+  });
+  const totalMinutes = rows.reduce((sum, item) => sum + Math.floor((item.duration || 0) / 60), 0);
+  return { totalMinutes, totalSessions: rows.length };
 };
 
-// ==================== 内容收藏 ====================
+// 收藏
 export const toggleFavorite = async (userId: string, contentId: string) => {
-  const { data: existing } = await supabase
-    .from('user_favorites')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('content_id', contentId)
-    .maybeSingle();
-  
+  const existing = await selectMaybeSingle<{ id: string }>('user_favorites', {
+    filters: [eq('user_id', userId), eq('content_id', contentId)],
+  });
   if (existing) {
-    const { error } = await supabase
-      .from('user_favorites')
-      .delete()
-      .eq('id', existing.id);
-    if (error) throw error;
+    await deleteRows('user_favorites', [eq('id', existing.id)]);
     return false;
-  } else {
-    const { error } = await supabase
-      .from('user_favorites')
-      .insert({ user_id: userId, content_id: contentId });
-    if (error) throw error;
-    return true;
   }
+  await insertRow('user_favorites', { user_id: userId, content_id: contentId });
+  return true;
 };
 
 export const getUserFavorites = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('user_favorites')
-    .select('*, healing_contents(*)')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<any>('user_favorites', {
+    filters: [eq('user_id', userId)],
+    orders: [desc('created_at')],
+  });
+  return rows;
 };
 
-export const isFavorited = async (userId: string, contentId: string) => {
-  const { data } = await supabase
-    .from('user_favorites')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('content_id', contentId)
-    .maybeSingle();
-  
-  return !!data;
-};
+export const isFavorited = async (userId: string, contentId: string) =>
+  !!(await selectMaybeSingle('user_favorites', {
+    filters: [eq('user_id', userId), eq('content_id', contentId)],
+  }));
 
-// ==================== 帖子分类 ====================
+// 分类
 export const getPostCategories = async () => {
-  const { data, error } = await supabase
-    .from('post_categories')
-    .select('*')
-    .order('created_at', { ascending: true });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<any>('post_categories', { orders: [asc('created_at')] });
+  return rows;
 };
 
 export const getCommunityPostsByCategory = async (categoryId?: string, limit = 20) => {
-  let query = supabase
-    .from('community_posts')
-    .select('*, post_categories(*)')
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  
-  if (categoryId) {
-    query = query.eq('category_id', categoryId);
-  }
-  
-  const { data, error } = await query;
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const filters = categoryId ? [eq('category_id', categoryId)] : undefined;
+  const { rows } = await listRows<CommunityPost>('community_posts', {
+    filters,
+    orders: [desc('created_at')],
+    limit,
+  });
+  return rows;
 };
 
 export const getRecoveryStories = async (limit = 10) => {
-  const { data, error } = await supabase
-    .from('community_posts')
-    .select('*, post_categories(*)')
-    .eq('is_recovery_story', true)
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<CommunityPost>('community_posts', {
+    filters: [eq('is_recovery_story', true)],
+    orders: [desc('created_at')],
+    limit,
+  });
+  return rows;
 };
 
-// ==================== 内容统计 ====================
+// 内容统计
 export const incrementViewCount = async (contentId: string) => {
-  const { error } = await supabase.rpc('increment_view_count', { content_id: contentId });
-  if (error) throw error;
+  await callRpc('increment_view_count', { content_id: contentId });
 };
 
 export const incrementLikeCount = async (contentId: string) => {
-  const { error } = await supabase.rpc('increment_like_count', { content_id: contentId });
-  if (error) throw error;
+  await callRpc('increment_like_count', { content_id: contentId });
 };
 
-// ==================== 医生患者关系 ====================
-export const getDoctorPatients = async (doctorId: string) => {
-  const { data, error } = await supabase
-    .from('doctor_patients')
-    .select('*, profiles!doctor_patients_patient_id_fkey(*)')
-    .eq('doctor_id', doctorId)
-    .eq('status', 'active')
-    .order('created_at', { ascending: false });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+// 医患关系
+export const getDoctorPatients = async (_doctorId: string) => {
+  const { rows } = await listRows<any>('doctor_patients', { orders: [desc('created_at')] });
+  return rows;
 };
 
-export const addPatient = async (doctorId: string, patientId: string, notes?: string) => {
-  const { data, error } = await supabase
-    .from('doctor_patients')
-    .insert({ doctor_id: doctorId, patient_id: patientId, notes })
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as DoctorPatient;
-};
+export const addPatient = async (doctorId: string, patientId: string, notes?: string) =>
+  insertRow<DoctorPatient>('doctor_patients', { doctor_id: doctorId, patient_id: patientId, notes });
 
-// ==================== 风险预警 ====================
+// 风险预警
 export const getRiskAlerts = async (isHandled?: boolean) => {
-  let query = supabase
-    .from('risk_alerts')
-    .select('*, profiles!risk_alerts_patient_id_fkey(username, full_name)');
-  
-  if (isHandled !== undefined) {
-    query = query.eq('is_handled', isHandled);
-  }
-  
-  const { data, error } = await query.order('created_at', { ascending: false });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const filters = isHandled === undefined ? undefined : [eq('is_handled', isHandled)];
+  const { rows } = await listRows<RiskAlert>('risk_alerts', { filters, orders: [desc('created_at')] });
+  return rows;
 };
 
-export const handleRiskAlert = async (alertId: string, handledBy: string, notes?: string) => {
-  const { data, error } = await supabase
-    .from('risk_alerts')
-    .update({
+export const handleRiskAlert = async (alertId: string, handledBy: string, notes?: string) =>
+  updateRow<RiskAlert>(
+    'risk_alerts',
+    {
       is_handled: true,
       handled_by: handledBy,
       handled_at: new Date().toISOString(),
       notes,
-    })
-    .eq('id', alertId)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as RiskAlert;
-};
+    },
+    [eq('id', alertId)]
+  );
 
 export const createRiskAlert = async (alert: Partial<RiskAlert>) => {
   if (alert.source_id) {
-    const { data: existing, error: existingError } = await supabase
-      .from('risk_alerts')
-      .select('*')
-      .eq('source_id', alert.source_id)
-      .eq('data_source', alert.data_source || 'fusion_report')
-      .maybeSingle();
-
-    if (existingError) throw existingError;
-    if (existing) return existing as RiskAlert;
+    const existing = await selectMaybeSingle<RiskAlert>('risk_alerts', {
+      filters: [eq('source_id', alert.source_id), eq('data_source', alert.data_source || 'fusion_report')],
+    });
+    if (existing) {
+      return existing;
+    }
   }
-
-  const { data, error } = await supabase
-    .from('risk_alerts')
-    .insert(alert)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as RiskAlert;
+  return insertRow<RiskAlert>('risk_alerts', alert as Record<string, unknown>);
 };
 
-// ==================== 知识库 ====================
+// 知识库
 export const getKnowledgeBase = async (category?: string) => {
-  let query = supabase
-    .from('knowledge_base')
-    .select('*')
-    .eq('is_active', true);
-  
-  if (category) {
-    query = query.eq('category', category);
-  }
-  
-  const { data, error } = await query.order('created_at', { ascending: false });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const filters = [eq('is_active', true)];
+  if (category) filters.push(eq('category', category));
+  const { rows } = await listRows<KnowledgeBase>('knowledge_base', {
+    filters,
+    orders: [desc('created_at')],
+  });
+  return rows;
 };
 
-export const createKnowledge = async (knowledge: Partial<KnowledgeBase>) => {
-  const { data, error } = await supabase
-    .from('knowledge_base')
-    .insert(knowledge)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as KnowledgeBase;
-};
+export const createKnowledge = async (knowledge: Partial<KnowledgeBase>) =>
+  insertRow<KnowledgeBase>('knowledge_base', knowledge as Record<string, unknown>);
 
-export const updateKnowledge = async (id: string, updates: Partial<KnowledgeBase>) => {
-  const { data, error } = await supabase
-    .from('knowledge_base')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as KnowledgeBase;
-};
+export const updateKnowledge = async (id: string, updates: Partial<KnowledgeBase>) =>
+  updateRow<KnowledgeBase>('knowledge_base', updates as Record<string, unknown>, [eq('id', id)]);
 
 export const deleteKnowledge = async (id: string) => {
-  const { error } = await supabase
-    .from('knowledge_base')
-    .delete()
-    .eq('id', id);
-  
-  if (error) throw error;
+  await deleteRows('knowledge_base', [eq('id', id)]);
 };
 
-// ==================== AI API调用 ====================
-export const chatCompletion = async (messages: ChatMessage[], enableThinking = false) => {
-  const { data, error } = await supabase.functions.invoke('chat-completion', {
-    body: { messages, enable_thinking: enableThinking },
-  });
-  
-  if (error) throw error;
-  return data;
-};
+// AI
+export const chatCompletion = async (messages: ChatMessage[], enableThinking = false) =>
+  invokeFunction<any>('chat-completion', { messages, enable_thinking: enableThinking });
 
-export const multimodalAnalysis = async (messages: MultimodalMessage[], enableThinking = false) => {
-  const { data, error } = await supabase.functions.invoke('multimodal-analysis', {
-    body: { messages, enable_thinking: enableThinking },
-  });
-  
-  if (error) throw error;
-  return data;
-};
+export const multimodalAnalysis = async (messages: MultimodalMessage[], enableThinking = false) =>
+  invokeFunction<any>('multimodal-analysis', { messages, enable_thinking: enableThinking });
 
-export const speechRecognition = async (audioBase64: string, format: 'wav' | 'm4a', rate: 16000 | 8000, len: number) => {
-  const { data, error } = await supabase.functions.invoke('speech-recognition', {
-    body: {
-      format,
-      rate,
-      cuid: crypto.randomUUID(),
-      speech: audioBase64,
-      len,
-    },
-  });
-  if (error) {
-    const msg = String((error as any)?.message || 'speech_recognition_error');
-    if (/API密钥未配置|apikey|authorization/i.test(msg)) {
-      throw new Error('语音识别未配置 API Key，请在 Supabase Functions 环境中设置 INTEGRATIONS_API_KEY');
-    }
-    throw error;
-  }
-  return data;
-};
+export const speechRecognition = async (
+  audioBase64: string,
+  format: 'wav' | 'm4a',
+  rate: 16000 | 8000,
+  len: number
+) => invokeFunction<any>('speech-recognition', {
+  format,
+  rate,
+  cuid: crypto.randomUUID(),
+  speech: audioBase64,
+  len,
+});
 
-// RAG检索 - 主动式对话
-export const ragRetrieval = async (query: string, conversationHistory: ChatMessage[], assessmentType: string = 'PHQ-9') => {
-  const { data, error } = await supabase.functions.invoke('rag-retrieval', {
-    body: {
-      query,
-      conversation_history: conversationHistory,
-      assessment_type: assessmentType,
-    },
-  });
-  if (error) throw error;
-  return data;
-};
+export const ragRetrieval = async (
+  query: string,
+  conversationHistory: ChatMessage[],
+  assessmentType = 'PHQ-9'
+) => invokeFunction<any>('rag-retrieval', {
+  query,
+  conversation_history: conversationHistory,
+  assessment_type: assessmentType,
+});
 
-// 多模态情绪融合分析
 export const multimodalFusion = async (params: {
   text_analysis?: any;
   image_analysis?: any;
@@ -881,51 +551,25 @@ export const multimodalFusion = async (params: {
   video_analysis?: any;
   user_id: string;
   assessment_id: string;
-}) => {
-  const { data, error } = await supabase.functions.invoke('multimodal-fusion', {
-    body: params,
-  });
-  if (error) throw error;
-  return data;
-};
+}) => invokeFunction<any>('multimodal-fusion', params);
 
-// ==================== 知识文档管理 ====================
-// 上传知识文档到Storage
+// 知识文档
 export const uploadKnowledgeDocument = async (file: File, category: string) => {
   const timestamp = Date.now();
   const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const filePath = `${category}/${timestamp}_${sanitizedName}`;
-  
-  const { data, error } = await supabase.storage
-    .from('knowledge-documents')
-    .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false
-    });
-
-  if (error) throw error;
+  const data = await uploadStorageFile('knowledge-documents', filePath, file);
   return { path: data.path, name: file.name, size: file.size, type: file.type };
 };
 
-// 删除知识文档
 export const deleteKnowledgeDocument = async (filePath: string) => {
-  const { error } = await supabase.storage
-    .from('knowledge-documents')
-    .remove([filePath]);
-    
-  if (error) throw error;
+  await deleteStorageFiles('knowledge-documents', [filePath]);
 };
 
-// 获取文档公开URL
-export const getKnowledgeDocumentUrl = (filePath: string) => {
-  const { data } = supabase.storage
-    .from('knowledge-documents')
-    .getPublicUrl(filePath);
-    
-  return data.publicUrl;
-};
+export const getKnowledgeDocumentUrl = (filePath: string) =>
+  publicStorageUrl('knowledge-documents', filePath);
 
-// ==================== 医生验证码管理 ====================
+// 医生验证码
 export interface DoctorVerificationCode {
   id: string;
   code: string;
@@ -938,84 +582,42 @@ export interface DoctorVerificationCode {
   notes?: string;
 }
 
-// 获取所有验证码（仅医生和管理员可用）
 export const getVerificationCodes = async () => {
-  const { data, error } = await supabase
-    .from('doctor_verification_codes')
-    .select('*')
-    .order('created_at', { ascending: false });
-  
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const { rows } = await listRows<DoctorVerificationCode>('doctor_verification_codes', {
+    orders: [desc('created_at')],
+  });
+  return rows;
 };
 
-// 创建验证码
-export const createVerificationCode = async (code: string, notes?: string, createdBy?: string) => {
-  const { data, error } = await supabase
-    .from('doctor_verification_codes')
-    .insert({
-      code,
-      is_permanent: false,
-      is_used: false,
-      notes,
-      created_by: createdBy,
-    })
-    .select()
-    .maybeSingle();
-  
-  if (error) throw error;
-  return data as DoctorVerificationCode;
-};
+export const createVerificationCode = async (code: string, notes?: string, createdBy?: string) =>
+  insertRow<DoctorVerificationCode>('doctor_verification_codes', {
+    code,
+    is_permanent: false,
+    is_used: false,
+    notes,
+    created_by: createdBy,
+  });
 
-// 删除验证码（仅能删除非永久验证码）
 export const deleteVerificationCode = async (id: string) => {
-  const { error } = await supabase
-    .from('doctor_verification_codes')
-    .delete()
-    .eq('id', id)
-    .eq('is_permanent', false); // 确保不能删除永久验证码
-  
-  if (error) throw error;
+  await deleteRows('doctor_verification_codes', [eq('id', id), eq('is_permanent', false)]);
 };
 
-// 验证码校验（用于注册时）
 export const verifyCode = async (code: string) => {
-  // Normalize user input to avoid false negatives caused by spaces/full-width chars.
-  const normalizedCode = code
-    .trim()
-    .replace(/[\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A]/g, (ch) =>
-      String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
-    );
-  const { data, error } = await supabase
-    .from('doctor_verification_codes')
-    .select('*')
-    .eq('code', normalizedCode)
-    .maybeSingle();
-  
-  if (error) throw error;
-  
+  const data = await selectMaybeSingle<DoctorVerificationCode>('doctor_verification_codes', {
+    filters: [eq('code', normalizeCode(code))],
+  });
   if (!data) {
     return { valid: false, message: '验证码不存在' };
   }
-  
   if (!data.is_permanent && data.is_used) {
     return { valid: false, message: '验证码已被使用' };
   }
-  
   return { valid: true, data };
 };
 
-// 标记验证码为已使用
 export const markCodeAsUsed = async (code: string, userId: string) => {
-  const normalizedCode = code
-    .trim()
-    .replace(/[\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A]/g, (ch) =>
-      String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
-    );
-  const { error } = await supabase.rpc('verify_and_use_code', {
-    p_code: normalizedCode,
+  await callRpc('verify_and_use_code', {
+    p_code: normalizeCode(code),
     p_user_id: userId,
   });
-  
-  if (error) throw error;
 };

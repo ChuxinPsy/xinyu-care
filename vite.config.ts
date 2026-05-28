@@ -23,6 +23,17 @@ export default defineConfig(({ mode }) => {
     publicDir: 'public',
     server: {
       allowedHosts: ['jp.jerrypsy.top'],
+      proxy: {
+        '/api': {
+          target: env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8088',
+          changeOrigin: true,
+        },
+      },
+    },
+    build: {
+      rollupOptions: {
+        maxParallelFileOps: 64,
+      },
     },
     plugins: [
       {
@@ -36,6 +47,12 @@ export default defineConfig(({ mode }) => {
 
           server.middlewares.use((req, _res, next) => {
             const url = req.url || '';
+            if (url.startsWith(`${normalizedBase}/api/`)) {
+              req.url = url.slice(normalizedBase.length);
+              next();
+              return;
+            }
+
             if (url.startsWith(`${normalizedBase}/innerapi/`)) {
               req.url = url.slice(normalizedBase.length);
               next();

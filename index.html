@@ -23,9 +23,6 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="data:application/json,%7B%22name%22%3A%22XinyuCare%22%2C%22short_name%22%3A%22XinyuCare%22%2C%22description%22%3A%22%E5%BF%83%E5%9F%9F%E6%99%BA%E6%8A%A4%20-%20%E5%A4%9A%E6%A8%A1%E6%80%81%E5%BF%83%E7%90%86%E6%A3%80%E6%B5%8B%E4%B8%8E%E7%96%97%E6%84%88%E7%B3%BB%E7%BB%9F%22%2C%22start_url%22%3A%22/%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23667eea%22%2C%22theme_color%22%3A%22%23764ba2%22%2C%22icons%22%3A%5B%5D%7D">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;600;700&display=swap"
@@ -3032,7 +3029,8 @@
         
         // 可能的路径前缀
         const possiblePaths = [
-          '/srcs/enjoy/',
+          new URL('srcs/enjoy/', window.location.href).toString(),
+          './srcs/enjoy/',
         ];
         
         let heroImageList = [];
@@ -3218,12 +3216,11 @@
         // 隐藏轮播容器
         function hideCarousel() {
           if (!heroImageCarousel) return;
-          console.log('🙈 顶部轮播使用占位图');
           // 清理旧内容
           heroImageCarousel.innerHTML = '';
           // 显示占位图（公共目录下的标志）
           const fallback = document.createElement('img');
-          fallback.src = '/images/logo/logo-icon.svg';
+          fallback.src = new URL('images/logo/logo-icon.svg', window.location.href).toString();
           fallback.alt = 'XinyuCare';
           fallback.className = 'hero-carousel-image active';
           heroImageCarousel.appendChild(fallback);
@@ -3249,15 +3246,16 @@
           heroInitCarousel();
         }
         
-        // 简化的调试信息
-        setTimeout(() => {
-          console.log('=== 🎭 图片轮播状态 ===');
-          console.log('容器状态:', heroImageCarousel ? '✅' : '❌');
-          console.log('工作路径:', workingPath || '❌ 未找到');
-          console.log('图片数量:', heroImageList.length);
-          console.log('轮播状态:', heroCarouselInterval ? '✅ 运行中' : '❌ 未启动');
-          console.log('缓存图片:', heroPreloadedImages.size, '张');
-        }, 3000);
+        if (!DISABLE_HERO_CAROUSEL) {
+          setTimeout(() => {
+            console.log('=== 🎭 图片轮播状态 ===');
+            console.log('容器状态:', heroImageCarousel ? '✅' : '❌');
+            console.log('工作路径:', workingPath || '❌ 未找到');
+            console.log('图片数量:', heroImageList.length);
+            console.log('轮播状态:', heroCarouselInterval ? '✅ 运行中' : '❌ 未启动');
+            console.log('缓存图片:', heroPreloadedImages.size, '张');
+          }, 3000);
+        }
 
         // 颜色交互演示功能
         function createColorDemo() {

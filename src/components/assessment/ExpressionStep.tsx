@@ -12,9 +12,10 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 
 interface ExpressionStepProps {
   onComplete: (data: any) => void;
+  onStageComplete?: (data: any) => void;
 }
 
-export default function ExpressionStep({ onComplete }: ExpressionStepProps) {
+export default function ExpressionStep({ onComplete, onStageComplete }: ExpressionStepProps) {
   const navigate = useNavigate();
   const DETECT_DURATION = 5;
   const [cameraStarted, setCameraStarted] = useState(false); // 新增：摄像头是否已启动
@@ -313,10 +314,10 @@ export default function ExpressionStep({ onComplete }: ExpressionStepProps) {
             text: prompt,
             image_url: dataUrl
           },
-          { timeout: 8000, signal: abortController.signal } // 8秒API超时
+          { timeout: 30000, signal: abortController.signal } // 优先等待真实视觉分析结果
         ),
-        9500, // 总超时9.5秒
-        '分析成功，正在输出报告...'
+        35000,
+        'AI分析超时，已切换为快速报告生成'
       );
       
       const elapsed = Date.now() - startTime;
@@ -414,6 +415,7 @@ export default function ExpressionStep({ onComplete }: ExpressionStepProps) {
       console.log('🔍 Micro Features:', analysisData?.micro_features);
       
       setReportData(analysisData);
+      onStageComplete?.(analysisData);
       setAnalysisProgress(100);
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
       setTimeout(() => {
@@ -435,11 +437,11 @@ export default function ExpressionStep({ onComplete }: ExpressionStepProps) {
       const isTimeout = errorMsg.includes('timed out') || errorMsg.includes('timeout') || errorMsg.includes('超时');
       
       if (isTimeout) {
-        toast.warning('AI分析成功，正在输出报告');
+        toast.warning('AI分析超时，已切换为快速报告生成');
       } else if (errorMsg.includes('OPENROUTER_API_KEY')) {
-        toast.error('AI分析成功，正在输出报告');
+        toast.error('AI服务配置异常，已切换为快速报告生成');
       } else {
-        toast.error('AI分析成功，正在输出报告');
+        toast.error('AI分析暂时不可用，已切换为快速报告生成');
       }
       
       // Use fallback data on error - 基于采集到的微表情信号生成更个性化的fallback
@@ -548,6 +550,7 @@ export default function ExpressionStep({ onComplete }: ExpressionStepProps) {
       console.log('🔍 Error Fallback Data:', errorFallbackData);
       console.log('🔍 Error Fallback Micro Features:', errorFallbackData.micro_features);
       setReportData(errorFallbackData);
+      onStageComplete?.(errorFallbackData);
       setAnalysisProgress(100);
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
       setTimeout(() => {

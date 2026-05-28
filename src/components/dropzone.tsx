@@ -1,7 +1,6 @@
 import { CheckCircle, File, Loader2, Upload, X } from 'lucide-react'
-import { createContext, type PropsWithChildren, useCallback, useContext } from 'react'
+import { createContext, type PropsWithChildren, type RefObject, useCallback, useContext } from 'react'
 import { Button } from '@/components/ui/button'
-import { type UseSupabaseUploadReturn } from '@/hooks/use-supabase-upload'
 import { cn } from '@/lib/utils'
 
 export const formatBytes = (
@@ -18,11 +17,40 @@ export const formatBytes = (
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-type DropzoneContextType = Omit<UseSupabaseUploadReturn, 'getRootProps' | 'getInputProps'>
+type FileError = {
+  code: string
+  message: string
+}
+
+type UploadFile = File & {
+  preview?: string
+  errors: readonly FileError[]
+}
+
+type DropzoneHookState = {
+  files: UploadFile[]
+  setFiles: (files: UploadFile[]) => void
+  successes: string[]
+  isSuccess: boolean
+  loading: boolean
+  errors: { name: string; message: string }[]
+  setErrors: (errors: { name: string; message: string }[]) => void
+  onUpload: () => Promise<void>
+  maxFileSize: number
+  maxFiles: number
+  allowedMimeTypes: string[]
+  getRootProps: (props?: Record<string, unknown>) => Record<string, unknown>
+  getInputProps: () => Record<string, unknown>
+  isDragActive: boolean
+  isDragReject: boolean
+  inputRef: RefObject<HTMLInputElement>
+}
+
+type DropzoneContextType = Omit<DropzoneHookState, 'getRootProps' | 'getInputProps'>
 
 const DropzoneContext = createContext<DropzoneContextType | undefined>(undefined)
 
-type DropzoneProps = UseSupabaseUploadReturn & {
+type DropzoneProps = DropzoneHookState & {
   className?: string
 }
 

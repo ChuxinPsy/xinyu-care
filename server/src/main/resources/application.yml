@@ -1,0 +1,55 @@
+server:
+  port: ${APP_PORT:8088}
+
+spring:
+  application:
+    name: xinyu-care-backend
+  datasource:
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3306/xinyu_care?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8}
+    username: ${DB_USERNAME:xinyu_care}
+    password: ${DB_PASSWORD:xinyu_care_dev}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 60MB
+
+app:
+  jwt-secret: ${JWT_SECRET:xinyu-care-dev-secret-change-me}
+  jwt-expiration-seconds: ${JWT_EXPIRATION_SECONDS:604800}
+  cors-origins:
+    - https://jp.jerrypsy.top
+    - http://jp.jerrypsy.top
+    - http://localhost:5173
+    - http://localhost:5174
+    - http://localhost:5175
+    - http://127.0.0.1:5173
+    - http://127.0.0.1:5174
+    - http://127.0.0.1:5175
+  storage:
+    mode: ${STORAGE_MODE:filesystem}
+    filesystem-root: ${FILESYSTEM_STORAGE_ROOT:../storage-data}
+    public-base-url: ${PUBLIC_STORAGE_BASE_URL:http://localhost:8088/api/storage/public}
+    # Production choice: Tencent COS via S3-compatible API.
+    # For production, configure STORAGE_MODE=s3 and set the S3-compatible endpoint/bucket below.
+    s3:
+      bucket: ${S3_BUCKET:}
+      endpoint: ${S3_ENDPOINT:}
+      region: ${S3_REGION:ap-guangzhou}
+      access-key: ${S3_ACCESS_KEY:}
+      secret-key: ${S3_SECRET_KEY:}
+      public-base-url: ${S3_PUBLIC_BASE_URL:}
+
+openrouter:
+  api-key: ${OPENROUTER_API_KEY:}
+  site-url: ${OPENROUTER_SITE_URL:http://localhost:5174}
+  app-name: ${OPENROUTER_APP_NAME:XinyuCare}
+  text-model: ${OPENROUTER_TEXT_MODEL:deepseek/deepseek-chat-v3-0324}
+  vision-model: ${OPENROUTER_VISION_MODEL:qwen/qwen2.5-vl-72b-instruct}
+  transcription-model: ${OPENROUTER_TRANSCRIPTION_MODEL:qwen/qwen3-asr-flash-2026-02-10}

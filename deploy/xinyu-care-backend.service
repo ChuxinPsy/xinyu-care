@@ -1,0 +1,16 @@
+[Unit]
+Description=XinyuCare Spring Boot Backend
+After=network.target mysql.service
+Wants=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/jerry/xinyu-care/app/server
+EnvironmentFile=/root/jerry/xinyu-care/app/.env.hosted
+ExecStart=/usr/bin/java -jar /root/jerry/xinyu-care/app/server/target/xinyu-care-backend-0.0.1-SNAPSHOT.jar
+SuccessExitStatus=143
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

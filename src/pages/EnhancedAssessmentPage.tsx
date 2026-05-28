@@ -114,7 +114,7 @@ export default function EnhancedAssessmentPage() {
                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                 className="absolute inset-0 overflow-hidden"
               >
-                <ExpressionStep onComplete={(data) => handleStepComplete('expression', data)} />
+            <ExpressionStep onComplete={(data) => handleStepComplete('expression', data)} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -223,7 +223,10 @@ export default function EnhancedAssessmentPage() {
           </div>
           {/* ExpressionStep 撑满列容器 */}
           <div className="flex-1 relative">
-            <ExpressionStep onComplete={(data) => setExpressionData(data)} />
+            <ExpressionStep
+              onComplete={(data) => setExpressionData(data)}
+              onStageComplete={(data) => setExpressionData(data)}
+            />
           </div>
         </div>
 

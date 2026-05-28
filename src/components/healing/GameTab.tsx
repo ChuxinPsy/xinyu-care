@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Play, Gamepad2, Smartphone, Hand, MoveUp, MoveDown, MoveLeft, MoveRight, Flame, Zap, Rainbow } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { publicAssetUrl } from '@/utils/public-assets';
 
 export default function GameTab() {
   const handleStartGame = () => {
@@ -41,7 +42,7 @@ export default function GameTab() {
           <div className="absolute inset-0 bg-orange-400/10 blur-[30px] rounded-full scale-110 group-hover:bg-orange-400/20 transition-all duration-700" />
           <div className="relative w-24 h-24 rounded-[28px] overflow-hidden border-[3px] border-white shadow-lg shadow-indigo-100/50">
             <img 
-              src="/temple_run_2_icon.png" 
+              src={publicAssetUrl('/temple_run_2_icon.png')} 
               alt="Temple Run 2" 
               className="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-110"
             />

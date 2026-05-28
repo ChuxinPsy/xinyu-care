@@ -1,7 +1,7 @@
 // src/types/virtual-modules.d.ts
 
 declare module '@/db/supabase' {
-  export const supabase: ReturnType<typeof import('@supabase/supabase-js').createClient>;
+  export {};
 }
 
 declare module '@/types/types' {

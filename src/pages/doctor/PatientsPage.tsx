@@ -4,11 +4,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getAllProfiles, getAssessments, getEmotionDiaries } from '@/db/api';
+import { resolveAvatarSource } from '@/lib/avatar-presets';
+import { cn } from '@/lib/utils';
 import type { Profile } from '@/types';
 import VerificationCodeManager from '@/components/doctor/VerificationCodeManager';
 import {
@@ -223,6 +225,19 @@ function ScaleReportPanel({ assessments }: { assessments: any[] }) {
         );
       })}
     </div>
+  );
+}
+
+function PatientAvatar({ avatarUrl, fallbackText, className }: { avatarUrl?: string | null; fallbackText: string; className?: string }) {
+  const avatarSource = resolveAvatarSource(avatarUrl);
+
+  return (
+    <Avatar className={className}>
+      {avatarSource.imageUrl && <AvatarImage src={avatarSource.imageUrl} />}
+      <AvatarFallback className={cn('bg-primary/10 text-primary', avatarSource.preset?.bg && 'text-white', avatarSource.preset?.bg)}>
+        {avatarSource.preset?.emoji || fallbackText}
+      </AvatarFallback>
+    </Avatar>
   );
 }
 
@@ -728,12 +743,11 @@ export default function PatientsPage() {
                   className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-border rounded-xl hover:border-primary/50 hover:bg-accent/50 transition-all gap-4"
                 >
                   <div className="flex items-center gap-4">
-                    <Avatar className="w-12 h-12 md:w-10 md:h-10">
-                      <AvatarImage src={patient.avatar_url} />
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        {patient.username.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                    <PatientAvatar
+                      avatarUrl={patient.avatar_url}
+                      fallbackText={patient.username.charAt(0).toUpperCase()}
+                      className="w-12 h-12 md:w-10 md:h-10"
+                    />
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-2 mb-1">
                         <span className="font-bold text-slate-800 dark:text-slate-200">
@@ -783,18 +797,20 @@ export default function PatientsPage() {
         <DialogContent className="max-w-3xl w-[95vw] md:w-full max-h-[92vh] overflow-y-auto flex flex-col p-0 rounded-2xl gap-0">
           <DialogHeader className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0">
             <DialogTitle className="text-xl">用户详情</DialogTitle>
+            <DialogDescription className="sr-only">
+              查看用户基本信息、量表评估、语音情绪、表情识别和对话记录。
+            </DialogDescription>
           </DialogHeader>
 
           {selectedPatient && (
             <div className="flex-1 flex flex-col min-h-0">
               {/* 基本信息 */}
               <div className="flex items-center gap-4 px-5 py-4 bg-muted/30 flex-shrink-0">
-                <Avatar className="w-14 h-14 border-2 border-white shadow-sm">
-                  <AvatarImage src={selectedPatient.avatar_url} />
-                  <AvatarFallback className="text-xl bg-primary/10 text-primary">
-                    {selectedPatient.username.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <PatientAvatar
+                  avatarUrl={selectedPatient.avatar_url}
+                  fallbackText={selectedPatient.username.charAt(0).toUpperCase()}
+                  className="w-14 h-14 border-2 border-white shadow-sm"
+                />
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <h3 className="text-lg font-bold truncate">

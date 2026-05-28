@@ -73,6 +73,13 @@ const getEmotionColor = (level: EmotionLevel) => {
 };
 
 const getEmotionEmoji = (level: EmotionLevel) => EMOTIONS.find(e => e.level === level)?.emoji || '😐';
+const getBundledEmotionImageUrl = (name: string) => `${import.meta.env.BASE_URL}srcs/enjoy/${encodeURIComponent(name)}`;
+const normalizeDiaryImageUrl = (url: string) => {
+  if (url.startsWith('/srcs/enjoy/')) {
+    return `${import.meta.env.BASE_URL}${url.replace(/^\/+/, '')}`;
+  }
+  return url;
+};
 
 export default function RecordPageNew() {
   const { user } = useAuth();
@@ -591,7 +598,7 @@ export default function RecordPageNew() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     {imageUrls.map((url, index) => (
                       <div key={index} className="relative w-16 h-16 group">
-                        <img src={url} alt={`upload-${index}`} className="w-full h-full object-cover rounded-md border" />
+                        <img src={normalizeDiaryImageUrl(url)} alt={`upload-${index}`} className="w-full h-full object-cover rounded-md border" />
                         <button
                           onClick={() => removeImage(index)}
                           className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -671,7 +678,7 @@ export default function RecordPageNew() {
                   <h4 className="text-sm font-medium mb-2">切换图片</h4>
                   <div className="grid grid-cols-6 gap-2">
                     {['开心_1.png','喜悦恋爱_1.png','治愈温暖_1.png','惊讶_1.png','困倦_1.png','悲伤_1.png','生气_1.png','害怕_1.png'].map((name) => {
-                      const src = `/srcs/enjoy/${encodeURIComponent(name)}`;
+                      const src = getBundledEmotionImageUrl(name);
                       return (
                         <button key={name} onClick={async () => {
                           const latest = getLatestDiaryForDate(selectedDate);
@@ -753,7 +760,7 @@ export default function RecordPageNew() {
                       <div className="grid grid-cols-3 gap-2">
                         {d.image_urls.map((url, idx) => (
                           <button key={idx} className="aspect-square rounded-lg overflow-hidden border hover:shadow" onClick={() => promptUploadForDiary(d.id, idx)} title="点击替换此图片">
-                            <img src={url} alt={`dimg-${idx}`} className="w-full h-full object-cover" />
+                            <img src={normalizeDiaryImageUrl(url)} alt={`dimg-${idx}`} className="w-full h-full object-cover" />
                           </button>
                         ))}
                         <button className="aspect-square rounded-lg overflow-hidden border-dashed border-2 border-muted-foreground/30 flex items-center justify-center text-xs text-muted-foreground hover:border-primary hover:text-primary" onClick={() => promptUploadForDiary(d.id)} title="添加图片">+

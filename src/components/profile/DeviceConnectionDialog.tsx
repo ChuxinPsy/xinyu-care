@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -76,6 +77,9 @@ export function DeviceConnectionDialog({
             </div>
             连接智能手环
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            扫描附近可连接的智能手环，查看连接状态，并在需要时断开当前设备。
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">

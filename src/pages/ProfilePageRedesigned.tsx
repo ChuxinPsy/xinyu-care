@@ -19,16 +19,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { getProfile, useAuth } from '@/contexts/AuthContext';
 import { getAssessments, getEmotionDiaries, updateProfile } from '@/db/api';
-import { supabase } from '@/db/supabase';
-
-// 预设头像选项
-const PRESET_AVATARS = [
-  { id: 'avatar1', emoji: '🧘', bg: 'bg-gradient-to-br from-rose-400 to-orange-300', label: '冥想' },
-  { id: 'avatar2', emoji: '🌸', bg: 'bg-gradient-to-br from-pink-400 to-rose-300', label: '樱花' },
-  { id: 'avatar3', emoji: '🌿', bg: 'bg-gradient-to-br from-emerald-400 to-teal-300', label: '绿叶' },
-  { id: 'avatar4', emoji: '☀️', bg: 'bg-gradient-to-br from-amber-400 to-yellow-300', label: '阳光' },
-  { id: 'avatar5', emoji: '🌊', bg: 'bg-gradient-to-br from-blue-400 to-cyan-300', label: '海浪' },
-];
+import { getAuthState } from '@/lib/backend-auth';
+import { PRESET_AVATARS } from '@/lib/avatar-presets';
+import { publicStorageUrl, uploadStorageFile } from '@/lib/backend-api';
 
 // 预设背景图片选项
 const PRESET_BACKGROUNDS = [
@@ -281,15 +274,9 @@ export default function ProfilePageRedesigned() {
   const uploadImageToStorage = async (file: File, bucket: string, folder: string): Promise<string> => {
     const ext = file.name.split('.').pop() || 'jpg';
     const filePath = `${folder}/${user?.id}_${Date.now()}.${ext}`;
-    
-    const { error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file, { upsert: false, cacheControl: '31536000' });
-    
-    if (error) throw error;
-    
-    const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
-    return data.publicUrl;
+
+    const data = await uploadStorageFile(bucket, filePath, file);
+    return data.publicUrl || publicStorageUrl(bucket, data.path);
   };
 
   // 处理头像上传
@@ -1056,8 +1043,8 @@ export default function ProfilePageRedesigned() {
                   return;
                 }
                 await refreshProfile();
-                const { data: { session } } = await supabase.auth.getSession();
-                const latestProfile = session?.user ? await getProfile(session.user.id) : null;
+                const { session } = await getAuthState();
+                const latestProfile = session?.user?.id ? await getProfile(session.user.id) : null;
                 setDoctorLoading(false);
                 setDoctorDialogOpen(false);
                 if (latestProfile?.role === 'doctor' || latestProfile?.role === 'admin') {

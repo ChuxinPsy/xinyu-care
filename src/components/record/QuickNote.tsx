@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/db/supabase';
 import { transcribeAudio } from '@/db/openrouter';
+import { uploadStorageFile } from '@/lib/backend-api';
 import { convertWebmToWav } from '@/utils/audio';
 
 interface QuickNoteProps {
@@ -147,25 +147,16 @@ export default function QuickNote({ onSave, initialContent = '', initialImages =
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `diary-images/${fileName}`;
 
-        // 上传到Supabase Storage
-        const { error } = await supabase.storage
-          .from('diary-images')
-          .upload(filePath, file);
-
-        if (error) {
+        try {
+          const data = await uploadStorageFile('diary-images', filePath, file);
+          uploadedUrls.push(data.publicUrl);
+          successCount++;
+        } catch (error) {
           console.error('上传图片失败:', error);
           toast.error(`上传 ${file.name} 失败`);
           errorCount++;
           continue;
         }
-
-        // 获取公开URL
-        const { data: urlData } = supabase.storage
-          .from('diary-images')
-          .getPublicUrl(filePath);
-
-        uploadedUrls.push(urlData.publicUrl);
-        successCount++;
       }
 
       if (uploadedUrls.length > 0) {
